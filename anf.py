@@ -35,6 +35,8 @@ class ANF(object):
         """
         Sets position of each segment of the neuron.
 
+        Note: units in use micrometers
+
         'straight'
         x0, y0, z0: coordinates of the initial segment
         x0, y0: are in the plane of cross section of scala tympani
@@ -399,7 +401,7 @@ if __name__ == "__main__":
     anf = ANF_Axon()
 
     h.topology()
-    # h.psection(sec=anf.sections['sec'][0])
+    h.psection(sec=anf.sections['sec'][0])
 
     v = thn.record_voltages(anf.sections['sec'])
 
