@@ -8,6 +8,9 @@ import numpy as np
 
 class Electrode(object):
     def __init__(self, el_num=None):
+        """
+        el_num: electrode number (1-12)
+        """
         self.x = 0              # um
         self.y = 0              # um
         self.z = None           # um
@@ -16,13 +19,16 @@ class Electrode(object):
         self.fs = None          # Hz
 
         if el_num is not None:
-            self.z = np.linspace(4600, 31000, 12)[el_num]
+            self.z = np.linspace(4600, 31000, 12)[el_num-1]
 
     def calculate_potentials(self, anf):
         """
         Calculate electrical potential for each segment of the ANF.
 
         """
+        assert self.stim is not None, "Stimulus must be set."
+        assert self.fs is not None, "Sampling frequency must be set."
+
         ### Calculate decay along cochlea
         gain_dB = -3            # -3dB / mm
         assert np.all(anf._z == anf._z[0])

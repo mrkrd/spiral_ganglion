@@ -5,7 +5,9 @@ from __future__ import division
 __author__ = "Marek Rudnicki"
 
 import numpy as np
-import biggles
+import multiprocessing
+import os
+#import biggles
 
 from anf import ANF_Axon
 from electrodes import Electrode
@@ -13,7 +15,66 @@ from electrodes import Electrode
 import neuron
 from neuron import h
 
-import thorns.nrn as thn
+# import thorns.nrn as thn
+
+
+def _simulate_anf_at(args):
+    z, electrodes = args
+
+    print
+    print os.getpid(), z
+
+    h.dt = 0.005
+    h.celsius = 37
+
+    anf = ANF_Axon()
+    anf.set_geometry('straight', x0=0, y0=500, z0=z)
+
+    anf.electrodes = electrodes
+
+    tmax = max([len(el.stim) for el in electrodes])
+    tmax = 1000 * tmax / electrodes[0].fs
+
+    # v = thn.record_voltages(anf.sections['sec'])
+
+    anf.einit()
+    neuron.init()
+    neuron.run(tmax)
+
+    # thn.plot_voltages(1000/h.dt, v).show()
+
+    return np.asarray(anf.spikes)
+
+
+def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
+
+    assert isinstance(stim, dict)
+
+    electrodes = []
+    for i in stim:
+        el = Electrode(i+1)
+        el.x = 300
+        el.fs = fs
+        el.stim = stim[i]
+
+        electrodes.append(el)
+
+    z_anf = np.linspace(0, 35000, anf_num)
+
+
+    if nproc is None:
+        nproc = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(processes=nproc)
+
+    space = [(z, el)
+             for z in z_anf
+             for el in [electrodes]]
+
+    trains = pool.map(_simulate_anf_at, space)
+
+    return trains
+
+
 
 def find_threshold(fs, stim, anf=None):
     h.dt = 0.005
@@ -21,7 +82,7 @@ def find_threshold(fs, stim, anf=None):
 
     if anf == None:
         electrode = Electrode()
-        electrode.x = 0
+        electrode.x = 300
         electrode.z = 0
 
         anf = ANF_Axon()
@@ -49,7 +110,7 @@ def find_threshold(fs, stim, anf=None):
 
 
     lo = 0
-    hi = 0.5
+    hi = 0.2
 
     # find initial range: lo/hi
     while run_sim(fs, stim, hi) == 0:
@@ -75,11 +136,20 @@ def find_threshold(fs, stim, anf=None):
 
 
 def main():
-    fs = 200000
-    stim = np.zeros(1000)
-    stim[300:320] = -1
+    import thorns as th
 
-    find_threshold(fs, stim)
+    fs = 100000
+    stim = np.zeros(1000)
+    stim[300:320] = -0.3
+    # stim[5000:5010] = -0.5
+
+    # find_threshold(fs, stim)
+
+    stim_dict = {6: stim}
+    trains = run_ci_simulation(fs, stim_dict, anf_num=10)
+    p = th.plot_raster(trains, symboltype='circle' )
+    p.xrange = (0, 1000*len(stim)/fs)
+    p.show()
 
 
 if __name__ == "__main__":
