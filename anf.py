@@ -63,7 +63,6 @@ class ANF(object):
             circumference = 2 * np.pi * r
             quarter = circumference / 4
 
-            self._z = kwargs['z'] * np.ones(len(L))
 
             # Initial straight segment
             sel = L[ (L<shift) ]
@@ -80,6 +79,10 @@ class ANF(object):
             x = np.append(x, a*np.ones(len(sel)))
             y = np.append(y, -sel)
 
+            self._x = x
+            self._y = y
+            self._z = kwargs['z'] * np.ones(len(L))
+
             # import matplotlib.pyplot as plt
             # plt.plot(x,y, 'o')
             # plt.show()
@@ -91,7 +94,11 @@ class ANF(object):
         Note: must be called *after* neuron.init()
 
         """
-        assert h.dt == 0.005
+        assert h.dt <= 0.005
+
+        for sec in self.sections['sec']:
+            sec.v = -60
+
         for v in self.vesicles:
             self._con.event(float(v))
 
@@ -104,7 +111,10 @@ class ANF(object):
         Note: must be called *before* neuron.init()
 
         """
-        assert h.dt == 0.005
+        assert h.dt <= 0.005
+
+        for sec in self.sections['sec']:
+            sec.v = -60
 
         self._stim_vectors = []
         if self.electrodes:
@@ -291,8 +301,11 @@ class ANF_With_Soma(ANF):
             seg.diam = diams[i]
 
 
+
+
 class ANF_Axon(ANF):
-    def __init__(self):
+    def __init__(self, na_type='rothman93'):
+
         print "ANF temperature:", h.celsius, "C"
 
         self.vesicles = []      # vesicle timings for acoustical stimulation
@@ -305,6 +318,8 @@ class ANF_Axon(ANF):
 
         sections = []
 
+        gna = 0.3
+
         ### Peripherial Axon Terminal
         term = h.Section()
         term.nseg = 1
@@ -314,8 +329,12 @@ class ANF_Axon(ANF):
         term.cm = 0.9
         term.insert('leak_manis')
         term.g_leak_manis = 1e-5
-        term.insert('na_manis')
-        term.gnabar_na_manis = 1
+        if na_type == 'rothman93':
+            term.insert('na_rothman93')
+            term.gnabar_na_rothman93 = gna
+        elif na_type == 'orig':
+            term.insert('na_manis')
+            term.gnabar_na_manis = gna
         term.insert('kht_manis')
         term.gkhtbar_kht_manis = 0.105
         term.insert('klt_manis')
@@ -346,8 +365,12 @@ class ANF_Axon(ANF):
             node.cm = 0.9
             node.insert('leak_manis')
             node.g_leak_manis = 1e-5
-            node.insert('na_manis')
-            node.gnabar_na_manis = 1
+            if na_type == 'rothman93':
+                node.insert('na_rothman93')
+                node.gnabar_na_rothman93 = gna
+            elif na_type == 'orig':
+                node.insert('na_manis')
+                node.gnabar_na_manis = gna
             node.insert('kht_manis')
             node.gkhtbar_kht_manis = 0.105
             node.insert('klt_manis')
@@ -357,11 +380,6 @@ class ANF_Axon(ANF):
             node.insert('extracellular')
             sections.append( ('p_node', node) )
 
-
-
-        # Remove the last inode
-        if sections[-1][0] == 'p_inode':
-            sections.pop()
 
 
         self.sections = np.rec.fromrecords(sections, names='typ,sec')
@@ -403,7 +421,7 @@ if __name__ == "__main__":
     h.topology()
     h.psection(sec=anf.sections['sec'][0])
 
-    v = thn.record_voltages(anf.sections['sec'])
+    v = thn.record_voltages(anf.sections['sec'][1:10])
 
     anf.vesicles = [2, 5]
 
@@ -416,32 +434,37 @@ if __name__ == "__main__":
     print "Spikes:", np.array(anf.spikes)
 
 
-
     print
-    print "========================"
+    print "==============================================="
+    print "Electrical stimulation"
     from electrodes import Electrode
-    anf.set_geometry('straight', x0=250, y0=500, z0=0)
+
+    # set ANF
+    anf = ANF_Axon()
+    # anf.set_geometry('straight', x0=250, y0=500, z0=0)
     anf.set_geometry('bent', a=750, b=500, z=0)
-    anf.vesicles = []
 
-
+    # set electrode
     el = Electrode()
     el.z = 0
-    print el.x, el.y, el.z
 
     stim = np.zeros(1000)
-    stim[280:300] = -0.3
-    stim[300:320] = 0.3
+    stim[280:300] = -0.5
+    stim[300:320] = 0.5
 
     el.fs = 200000
     el.stim = stim
 
+    # `connect' ANF and electrode
     anf.electrodes = [el]
 
+    # run
+    v = thn.record_voltages(anf.sections['sec'][-10:-1])
     anf.einit()
     neuron.init()
     neuron.run(len(stim) * h.dt)
 
+    # plot
     thn.plot_voltages(1/h.dt, v).show()
 
 

@@ -31,8 +31,12 @@ class Electrode(object):
         stim = z_decay * self.stim
 
         ### Calculate homogenious medium (1/r)
-        r = np.sqrt(anf._x**2 + anf._y**2)
-        node_factors = 1e4 / (4 * np.pi * r * 300)
+        r = np.sqrt((self.x - anf._x)**2 + (self.y - anf._y)**2)
+        node_factors = 300 * 1e4 / (4 * np.pi * r)
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(node_factors)
+        # plt.show()
 
         return np.outer(node_factors, stim)
 
