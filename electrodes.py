@@ -11,7 +11,7 @@ class Electrode(object):
         """
         el_num: electrode number (1-12)
         """
-        self.x = 0              # um
+        self.x = 300            # um
         self.y = 0              # um
         self.z = None           # um
 

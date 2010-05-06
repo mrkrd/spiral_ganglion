@@ -18,8 +18,7 @@ from neuron import h
 # import thorns.nrn as thn
 
 
-def _simulate_anf_at(args):
-    z, electrodes = args
+def _simulate_anf_at( (z, electrodes) ):
 
     print
     print os.getpid(), z
@@ -44,6 +43,7 @@ def _simulate_anf_at(args):
     # thn.plot_voltages(1000/h.dt, v).show()
 
     return np.asarray(anf.spikes)
+
 
 
 def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
@@ -76,26 +76,10 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
 
 
 
-def find_threshold(fs, stim, anf=None):
-    h.dt = 0.005
-    h.celsius = 37
-
-    if anf == None:
-        electrode = Electrode()
-        electrode.x = 300
-        electrode.z = 0
-
-        anf = ANF_Axon()
-        # anf.set_geometry('bent', a=750, b=500, z=0)
-        anf.set_geometry('straight', x0=0, y0=500, z0=0)
-        anf.electrodes = [electrode]
-    else:
-        assert len(anf.electrodes) == 1
-        electrode = anf.electrodes[0]
-
-
-    # v = thn.record_voltages(anf.sections['sec'])
-
+def _find_threshold(anf, electrode):
+    stim = electrode.stim
+    fs = electrode.fs
+    anf.electrodes = [electrode]
 
     def run_sim(fs, stim, amp):
         electrode.fs = fs
@@ -103,11 +87,10 @@ def find_threshold(fs, stim, anf=None):
 
         anf.einit()
         neuron.init()
-        tmax = len(stim) * 1000 / fs
+        tmax = 1000 * len(stim) / fs
         neuron.run(tmax)
 
         return len(anf.spikes)
-
 
     lo = 0
     hi = 0.2
@@ -117,10 +100,10 @@ def find_threshold(fs, stim, anf=None):
         lo = hi
         hi = hi * 2
 
-
+    # binary search for amp
     while (hi-lo) > 0.01*(hi+lo)/2:
         amp = (hi+lo)/2
-        print amp
+        # print amp
         cnt = run_sim(fs, stim, amp)
         if cnt == 0:
             lo = amp
@@ -129,9 +112,31 @@ def find_threshold(fs, stim, anf=None):
         else:
             assert False, "Spike count should never be < 0"
 
-
-    # thn.plot_voltages(1000/h.dt, v).show()
+    # restore original stim
+    electrode.stim = stim
     return amp
+
+
+
+
+def find_threshold(fs, stim):
+    h.dt = 0.005
+    h.celsius = 37
+
+    electrode = Electrode()
+    electrode.x = 300
+    electrode.z = 0
+    electrode.stim = stim
+    electrode.fs = fs
+
+    anf = ANF_Axon()
+    # anf.set_geometry('bent', a=750, b=500, z=0)
+    anf.set_geometry('straight', x0=0, y0=500, z0=0)
+
+    return _find_threshold(anf, electrode)
+
+
+
 
 
 
@@ -140,13 +145,14 @@ def main():
 
     fs = 100000
     stim = np.zeros(1000)
-    stim[300:320] = -0.3
+    stim[300:320] = -0.5
     # stim[5000:5010] = -0.5
 
-    # find_threshold(fs, stim)
+    find_threshold(fs, stim)
+    exit()
 
     stim_dict = {6: stim}
-    trains = run_ci_simulation(fs, stim_dict, anf_num=10)
+    trains = run_ci_simulation(fs, stim_dict, anf_num=50)
     p = th.plot_raster(trains, symboltype='circle' )
     p.xrange = (0, 1000*len(stim)/fs)
     p.show()
