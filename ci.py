@@ -48,19 +48,29 @@ def _simulate_anf_at( (z, electrodes) ):
 
 def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
 
-    assert isinstance(stim, dict)
-
     electrodes = []
-    for i in stim:
-        el = Electrode(i+1)
-        el.x = 300
-        el.fs = fs
-        el.stim = stim[i]
 
-        electrodes.append(el)
+    if isinstance(stim, dict):
+        for i in stim:
+            el = Electrode(i+1)
+            el.x = 300
+            el.fs = fs
+            el.stim = stim[i]
+            electrodes.append(el)
+
+    elif isinstance(stim, np.ndarray):
+        assert stim.ndim == 2
+        assert stim.shape[1] == 12
+
+        for i,s in enumerate(stim.T):
+            el = Electrode(i+1)
+            el.x = 300
+            el.fs = fs
+            el.stim = s
+            electrodes.append(el)
+
 
     z_anf = np.linspace(0, 35000, anf_num)
-
 
     if nproc is None:
         nproc = multiprocessing.cpu_count()
