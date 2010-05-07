@@ -304,7 +304,7 @@ class ANF_With_Soma(ANF):
 
 
 class ANF_Axon(ANF):
-    def __init__(self, na_type='rothman93'):
+    def __init__(self, nodes=15, na_type='rothman93'):
 
         print "ANF temperature:", h.celsius, "C"
 
@@ -345,7 +345,7 @@ class ANF_Axon(ANF):
         sections.append( ('p_term', term) )
 
         ### Peripherial Axon Nodes and Internodes
-        for i in range(15):
+        for i in range(nodes):
             inode = h.Section()
             inode.nseg = 1
             inode.L = 250
