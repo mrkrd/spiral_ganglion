@@ -87,6 +87,17 @@ class ANF(object):
             # plt.plot(x,y, 'o')
             # plt.show()
 
+
+    def get_voltages(self):
+        voltages = [np.asarray(vec) for vec in self._voltages]
+        voltages = np.array(voltages).T
+        return voltages
+
+
+    def get_spikes(self):
+        return np.asarray(self.spikes)
+
+
     def ainit(self):
         """
         Initializes acoustical stimulation.
@@ -304,7 +315,7 @@ class ANF_With_Soma(ANF):
 
 
 class ANF_Axon(ANF):
-    def __init__(self, nodes=15, na_type='rothman93'):
+    def __init__(self, nodes=15, na_type='rothman93', record_voltages=False):
 
         print "ANF temperature:", h.celsius, "C"
 
@@ -408,20 +419,26 @@ class ANF_Axon(ANF):
         self._probe.record(self.spikes)
 
 
+        ### Recording voltages from all sections
+        self._voltages = []
+        if record_voltages:
+            for sec in self.sections['sec']:
+                vec = h.Vector()
+                vec.record(sec(0.5)._ref_v)
+                self._voltages.append(vec)
+
+
 
 if __name__ == "__main__":
-    # import biggles
     import thorns.nrn as thn
 
     h.dt = 0.005
     h.celsius = 37
 
-    anf = ANF_Axon()
+    anf = ANF_Axon(record_voltages=True)
 
     h.topology()
     h.psection(sec=anf.sections['sec'][0])
-
-    v = thn.record_voltages(anf.sections['sec'][1:10])
 
     anf.vesicles = [2, 5]
 
@@ -429,7 +446,7 @@ if __name__ == "__main__":
     anf.ainit()
     neuron.run(10)
 
-    thn.plot_voltages(1/h.dt, v).show()
+    thn.plot_voltages(1/h.dt, anf.get_voltages().T).show()
 
     print "Spikes:", np.array(anf.spikes)
 
@@ -440,7 +457,7 @@ if __name__ == "__main__":
     from electrodes import Electrode
 
     # set ANF
-    anf = ANF_Axon()
+    anf = ANF_Axon(record_voltages=True)
     # anf.set_geometry('straight', x0=250, y0=500, z0=0)
     anf.set_geometry('bent', a=750, b=500, z=0)
 
@@ -459,12 +476,11 @@ if __name__ == "__main__":
     anf.electrodes = [el]
 
     # run
-    v = thn.record_voltages(anf.sections['sec'][-10:-1])
     anf.einit()
     neuron.init()
     neuron.run(len(stim) * h.dt)
 
     # plot
-    thn.plot_voltages(1/h.dt, v).show()
+    thn.plot_voltages(1/h.dt, anf.get_voltages().T).show()
 
 

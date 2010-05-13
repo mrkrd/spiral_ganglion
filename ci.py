@@ -15,10 +15,10 @@ from electrodes import Electrode
 import neuron
 from neuron import h
 
-# import thorns.nrn as thn
+import thorns.nrn as thn
 
 
-def _simulate_anf_at( (z, electrodes) ):
+def _simulate_anf_at( (z, electrodes, return_voltages) ):
 
     print
     print os.getpid(), z
@@ -26,7 +26,7 @@ def _simulate_anf_at( (z, electrodes) ):
     h.dt = 0.005
     h.celsius = 37
 
-    anf = ANF_Axon()
+    anf = ANF_Axon(record_voltages=return_voltages)
     anf.set_geometry('straight', x0=0, y0=500, z0=z)
 
     anf.electrodes = electrodes
@@ -34,20 +34,27 @@ def _simulate_anf_at( (z, electrodes) ):
     tmax = max([len(el.stim) for el in electrodes])
     tmax = 1000 * tmax / electrodes[0].fs
 
-    # v = thn.record_voltages(anf.sections['sec'])
-
     anf.einit()
     neuron.init()
     neuron.run(tmax)
 
-    # thn.plot_voltages(1000/h.dt, v).show()
 
-    return np.asarray(anf.spikes)
+    if return_voltages:
+        return anf.get_voltages()
+    else:
+        return np.asarray(anf.spikes)
 
 
 
-def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
+def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
+    """
+    fs: sampling frequency of the simulus
+    stim: electrical stmulation (dict/np.array)
+    anf_num: number of ANF to compute (are equally spread over cochlea)
+    nproc: number of processes to spawn
+    return_voltages: if True voltage traces are returned instead of spike trains
 
+    """
     electrodes = []
 
     if isinstance(stim, dict):
@@ -76,9 +83,10 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None):
         nproc = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=nproc)
 
-    space = [(z, el)
+    space = [(z, el, v)
              for z in z_anf
-             for el in [electrodes]]
+             for el in [electrodes]
+             for v in [return_voltages]]
 
     trains = pool.map(_simulate_anf_at, space)
 
