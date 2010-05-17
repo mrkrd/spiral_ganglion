@@ -7,6 +7,10 @@ __author__ = "Marek Rudnicki"
 import numpy as np
 
 class Electrode(object):
+    """
+    Represents electrode located at (self.x, self.y, self.z) coordinates.
+
+    """
     def __init__(self, el_num=None):
         """
         el_num: electrode number (1-12)

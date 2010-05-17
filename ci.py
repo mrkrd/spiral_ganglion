@@ -23,7 +23,8 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
     print
     print os.getpid(), z
 
-    h.dt = 0.005
+    if h.dt > 0.005:
+        h.dt = 0.005
     h.celsius = 37
 
     anf = ANF_Axon(record_voltages=return_voltages)
@@ -48,6 +49,15 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
 
 def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
     """
+    Run CI simulation where 12 electrodes are located along the
+    cochlea and `anf_num' of auditory nerve fibers is spread
+    uniformly.  Returns a list of spike trains or recorded membrane
+    potentials (return_voltages=True).
+
+    Simulation is run in multiprocessing mode, i.e. each ANF is
+    assigned to a different processor.  The more processor the faster
+    the simulation!
+
     fs: sampling frequency of the simulus
     stim: electrical stmulation (dict/np.array)
     anf_num: number of ANF to compute (are equally spread over cochlea)
@@ -136,8 +146,15 @@ def _find_threshold(anf, electrode):
 
 
 
-
 def find_threshold(fs, stim):
+    """
+    Binary search of the firing threshold in the standard CI
+    configuration for the given `stim' signal.
+
+    See the function's body to see what `standard configuration' is
+    like.
+
+    """
     h.dt = 0.005
     h.celsius = 37
 
@@ -152,9 +169,6 @@ def find_threshold(fs, stim):
     anf.set_geometry('straight', x0=0, y0=500, z0=0)
 
     return _find_threshold(anf, electrode)
-
-
-
 
 
 

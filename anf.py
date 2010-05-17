@@ -89,12 +89,25 @@ class ANF(object):
 
 
     def get_voltages(self):
+        """
+        Returns time courses of membrane potentials for each section
+        of the model.  Potentials are recorded in the from the middle
+        of each section: sec(0.5).
+
+        Neuron must be initialized with `record_voltages=True'.
+
+        """
         voltages = [np.asarray(vec) for vec in self._voltages]
         voltages = np.array(voltages).T
         return voltages
 
 
     def get_spikes(self):
+        """
+        Return an array of spike timings recorded from the last
+        section.
+
+        """
         return np.asarray(self.spikes)
 
 
@@ -315,8 +328,42 @@ class ANF_With_Soma(ANF):
 
 
 class ANF_Axon(ANF):
-    def __init__(self, nodes=15, na_type='rothman93', record_voltages=False):
+    """
+    Model of Auditory Nerve Fiber's peripherial axon.  Can be used
+    for acoustical and electrical stimulation.
 
+    anf = ANF_Axon()
+
+    Acoustical stimulation
+    ======================
+    anf.vesicles = [12, 24, 55]
+    neuron.init()
+    anf.ainit()
+    neuron.run(60)
+
+
+    Electrical stimulation
+    ======================
+    anf.electrodes = [electrode1, electrode2, electrode3]
+    anf.einit()
+    neuron.init()
+    neuron.run(60)
+
+    """
+    def __init__(self, nodes=15, na_type='rothman93', record_voltages=False):
+        """
+        nodes: number of nodes in the model.  Total number of
+               compartments if 2*nodes.  Default is nodes=15.
+
+        na_type: 'rothman93'/'orig' specifies which Na+ channel should
+                 be used for the simulation
+
+        record_voltages: when True membrane potentials are recorded
+                         internally and can be returned with
+                         get_voltages()
+
+
+        """
         print "ANF temperature:", h.celsius, "C"
 
         self.vesicles = []      # vesicle timings for acoustical stimulation
