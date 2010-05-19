@@ -128,14 +128,15 @@ class ANF(object):
 
 
 
-    def einit(self):
+    def einit(self, do_assert=True):
         """
         Initializes electrical stimulation.
 
         Note: must be called *before* neuron.init()
 
         """
-        assert h.dt <= 0.005
+        if do_assert:
+            assert h.dt <= 0.005
 
         for sec in self.sections['sec']:
             sec.v = -60
@@ -350,10 +351,10 @@ class ANF_Axon(ANF):
     neuron.run(60)
 
     """
-    def __init__(self, nodes=15, na_type='rothman93', record_voltages=False):
+    def __init__(self, nodes=20, na_type='rothman93', record_voltages=False):
         """
         nodes: number of nodes in the model.  Total number of
-               compartments if 2*nodes.  Default is nodes=15.
+               compartments if 2*nodes.
 
         na_type: 'rothman93'/'orig' specifies which Na+ channel should
                  be used for the simulation
