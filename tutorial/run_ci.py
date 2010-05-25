@@ -19,17 +19,17 @@ def main(fin, fout):
     assert isinstance(fs, float)
     assert stim.ndim == 2
 
-    trains = sg.run_ci_simulation(fs, stim, anf_num=100)
+    trains = sg.run_ci_simulation(fs, stim, anf_num=4)
     trains = np.array(trains, dtype=object)
 
     scipy.io.savemat(fout, {'spike_trains': trains})
 
     # Plot results
     try:
+        import matplotlib.pyplot as plt
         import thorns as th
-        plot = th.plot_raster(trains) #, symboltype='circle')
-        plot.xrange = (0, 1000*len(stim)/fs)
-        plot.show()
+        plot = th.plot_raster(trains, backend='matplotlib') #, symboltype='circle')
+        plt.show()
     except ImportError:
         pass
 
