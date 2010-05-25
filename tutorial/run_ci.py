@@ -28,7 +28,7 @@ def main(fin, fout):
     try:
         import matplotlib.pyplot as plt
         import thorns as th
-        plot = th.plot_raster(trains, backend='matplotlib') #, symboltype='circle')
+        plot = th.plot_raster(trains, backend='matplotlib')
         plt.show()
     except ImportError:
         pass
