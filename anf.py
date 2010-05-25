@@ -118,7 +118,7 @@ class ANF(object):
         Note: must be called *after* neuron.init()
 
         """
-        assert h.dt <= 0.005
+        assert h.dt <= 0.002
 
         for sec in self.sections['sec']:
             sec.v = -60
@@ -136,7 +136,7 @@ class ANF(object):
 
         """
         if do_assert:
-            assert h.dt <= 0.005
+            assert h.dt <= 0.002
 
         for sec in self.sections['sec']:
             sec.v = -60
@@ -333,6 +333,12 @@ class ANF_Axon(ANF):
     Model of Auditory Nerve Fiber's peripherial axon.  Can be used
     for acoustical and electrical stimulation.
 
+    Initially has be described by Paul Wilhem Bade in his Master's
+    Thesis.  This implementation includes modified Na+ channels
+    (Rothman 1993) that correct refractory period in acoustical
+    stimulation.  Na+ maximum conductance has also been changed (1
+    S/cm2 -> 0.3 S/cm2).
+
     anf = ANF_Axon()
 
     Acoustical stimulation
@@ -480,7 +486,7 @@ class ANF_Axon(ANF):
 if __name__ == "__main__":
     import thorns.nrn as thn
 
-    h.dt = 0.005
+    h.dt = 0.002
     h.celsius = 37
 
     anf = ANF_Axon(record_voltages=True)

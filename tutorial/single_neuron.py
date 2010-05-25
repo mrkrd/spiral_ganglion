@@ -14,7 +14,7 @@ from neuron import h
 
 def main():
     h.celsius = 37
-    h.dt = 0.005
+    h.dt = 0.002
 
 
     ### Set the auditory nerve fiber

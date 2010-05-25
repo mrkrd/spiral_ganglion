@@ -23,8 +23,8 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
     print
     print os.getpid(), z
 
-    if h.dt > 0.005:
-        h.dt = 0.005
+    if h.dt > 0.002:
+        h.dt = 0.002
     h.celsius = 37
 
     anf = ANF_Axon(record_voltages=return_voltages)
@@ -155,7 +155,7 @@ def find_threshold(fs, stim):
     like.
 
     """
-    h.dt = 0.005
+    h.dt = 0.002
     h.celsius = 37
 
     electrode = Electrode()
