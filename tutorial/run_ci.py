@@ -19,7 +19,7 @@ def main(fin, fout):
     assert isinstance(fs, float)
     assert stim.ndim == 2
 
-    trains = sg.run_ci_simulation(fs, stim, anf_num=4)
+    trains = sg.run_ci_simulation(fs, stim, anf_num=100)
     trains = np.array(trains, dtype=object)
 
     scipy.io.savemat(fout, {'spike_trains': trains})
