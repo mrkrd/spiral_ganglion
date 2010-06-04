@@ -118,7 +118,7 @@ class ANF(object):
         Note: must be called *after* neuron.init()
 
         """
-        assert h.dt <= 0.002
+        assert h.dt <= 0.01
 
         for sec in self.sections['sec']:
             sec.v = -60
@@ -298,10 +298,10 @@ class ANF_With_Soma(ANF):
         self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
         self._syn.tau1 = 0.100906 / q10 ** ((h.celsius - 22) / 10)
         self._syn.tau2 = 0.592521 / q10 ** ((h.celsius - 22) / 10)
+        self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
         self._con.weight[0] = 0.001864 * q10 ** ((h.celsius - 22) / 10)
         self._con.delay = 0
-
 
         ### Recording spikes from the last section
         last = self.sections['sec'][-1]
@@ -383,7 +383,7 @@ class ANF_Axon(ANF):
 
         sections = []
 
-        gna = 0.3
+        gna = 0.324
 
         ### Peripherial Axon Terminal
         term = h.Section()
@@ -459,10 +459,11 @@ class ANF_Axon(ANF):
         ### IHC Synapse
         q10 = np.exp(np.log(129.4 / 81.7) * (10. / (37 - 22)))
         self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
-        self._syn.tau1 = 0.100906 / q10 ** ((h.celsius - 22) / 10)
-        self._syn.tau2 = 0.592521 / q10 ** ((h.celsius - 22) / 10)
+        self._syn.tau1 = 0.30 / q10 ** ((h.celsius - 22) / 10)
+        self._syn.tau2 = 0.31 / q10 ** ((h.celsius - 22) / 10)
+        self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.001864 * q10 ** ((h.celsius - 22) / 10)
+        self._con.weight[0] = 0.00067 * q10 ** ((h.celsius - 22) / 10)
         self._con.delay = 0
 
 
