@@ -10,6 +10,9 @@ import neuron
 from neuron import h
 
 class ANF(object):
+    def _Tf(q10, temp_ref=22):
+        q10 ** ((h.celsius - temp_ref)/10)
+
     def _get_segments(self):
         """ Returns list of all segments along the neuron """
         segments = []
@@ -457,14 +460,13 @@ class ANF_Axon(ANF):
 
 
         ### IHC Synapse
-        q10 = (129.4 / 81.7) ** (10. / (37 - 22))
-        Tf = q10 ** ((h.celsius - 22) / 10)
         self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
-        self._syn.tau1 = 0.399806796048 / Tf
-        self._syn.tau2 = 0.399889764048 / Tf
+        self._syn.tau1 = 0.399806796048 / _Tf(q10=2.5)
+        self._syn.tau2 = 0.399889764048 / _Tf(q10=1.6)
+        assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * Tf
+        self._con.weight[0] = 0.000716352978448 * _Tf(q10=2.5)
         self._con.delay = 0
 
         # q10 = np.exp(np.log(129.4 / 81.7) * (10. / (37 - 22)))
