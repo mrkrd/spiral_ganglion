@@ -302,7 +302,7 @@ class ANF_Axon(ANF):
         assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * self._Tf(q10=1.6)
+        self._con.weight[0] = 0.000716352978448 * self._Tf(q10=1.5262)
         self._con.delay = 0
 
         # q10 = np.exp(np.log(129.4 / 81.7) * (10. / (37 - 22)))
