@@ -196,7 +196,7 @@ class ANF_Axon(ANF):
     neuron.run(60)
 
     """
-    def __init__(self, nodes=20, na_type='rothman93', record_voltages=False):
+    def __init__(self, nodes=20, na_type='rothman93', gna=0.324, record_voltages=False):
         """
         nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -221,8 +221,6 @@ class ANF_Axon(ANF):
                                 # (class Electrode)
 
         sections = []
-
-        gna = 0.324
 
         ### Peripherial Axon Terminal
         term = h.Section()
