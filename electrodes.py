@@ -34,7 +34,7 @@ class Electrode(object):
         assert self.fs is not None, "Sampling frequency must be set."
 
         ### Calculate decay along cochlea
-        gain_dB = -3            # -3dB / mm
+        gain_dB = -1            # -1dB / mm
         assert np.all(anf._z == anf._z[0])
         exponent = gain_dB * np.abs(self.z - anf._z[0]) / 1000 / 20
         z_decay = 10**exponent

@@ -19,8 +19,8 @@ def main():
 
     ### Set the auditory nerve fiber
     anf = sg.ANF_Axon(record_voltages=True)
-    # anf.set_geometry('straight', x0=250, y0=500, z0=0)
-    anf.set_geometry('bent', a=750, b=500, z=0)
+    anf.set_geometry('straight', x0=0, y0=500, z0=0)
+    # anf.set_geometry('bent', a=750, b=500, z=0)
 
 
     ### Set the electrodes
