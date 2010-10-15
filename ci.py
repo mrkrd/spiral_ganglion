@@ -118,7 +118,7 @@ def _find_threshold(anf, electrode):
         tmax = 1000 * len(stim) / fs
         neuron.run(tmax)
 
-        return len(anf.spikes)
+        return len(anf.get_spikes())
 
     lo = 0
     hi = 0.2

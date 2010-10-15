@@ -303,16 +303,6 @@ class ANF_Axon(ANF):
         self._con.weight[0] = 0.000716352978448 * self._Tf(q10=1.5262)
         self._con.delay = 0
 
-        # q10 = np.exp(np.log(129.4 / 81.7) * (10. / (37 - 22)))
-        # self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
-        # self._syn.tau1 = 0.100906 / q10 ** ((h.celsius - 22) / 10)
-        # self._syn.tau2 = 0.592521 / q10 ** ((h.celsius - 22) / 10)
-        # self._syn.e = 0
-        # self._con = h.NetCon(None, self._syn)
-        # self._con.weight[0] = 0.001864 * q10 ** ((h.celsius - 22) / 10)
-        # self._con.delay = 0
-
-
         ### Recording spikes from the last section
         last = self.sections['sec'][-1]
         self._probe = h.NetCon(last(0.5)._ref_v, None, 0, 0, 0, sec=last)
