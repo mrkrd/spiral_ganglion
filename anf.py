@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
+
 __author__ = "Marek Rudnicki"
 
 import numpy as np
@@ -8,6 +9,7 @@ from scipy.interpolate import interp1d
 
 import neuron
 from neuron import h
+
 
 class ANF(object):
     def _Tf(self, q10, temp_ref=22):
@@ -106,12 +108,17 @@ class ANF(object):
 
 
     def get_spikes(self):
-        """
-        Return an array of spike timings recorded from the last
+        """Return an array of spike timings recorded from the last
         section.
 
         """
-        return np.asarray(self.spikes)
+        assert h.t != 0, "Time is 0 (did you run the simulation already?)"
+
+        train = np.array( (np.array(self._spikes), h.t),
+                          dtype=[('spikes', np.ndarray),
+                                 ('duration', float)] )
+
+        return train
 
 
     def ainit(self):
@@ -196,9 +203,12 @@ class ANF_Axon(ANF):
     neuron.run(60)
 
     """
-    def __init__(self, nodes=20, na_type='rothman93', gna=0.324, record_voltages=False):
-        """
-        nodes: number of nodes in the model.  Total number of
+    def __init__(self,
+                 nodes=20,
+                 na_type='rothman93',
+                 gna=0.324,
+                 record_voltages=False):
+        """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
 
         na_type: 'rothman93'/'orig' specifies which Na+ channel should
@@ -207,7 +217,6 @@ class ANF_Axon(ANF):
         record_voltages: when True membrane potentials are recorded
                          internally and can be returned with
                          get_voltages()
-
 
         """
         print "ANF temperature:", h.celsius, "C"
@@ -306,8 +315,8 @@ class ANF_Axon(ANF):
         ### Recording spikes from the last section
         last = self.sections['sec'][-1]
         self._probe = h.NetCon(last(0.5)._ref_v, None, 0, 0, 0, sec=last)
-        self.spikes = h.Vector()
-        self._probe.record(self.spikes)
+        self._spikes = h.Vector()
+        self._probe.record(self._spikes)
 
 
         ### Recording voltages from all sections
@@ -339,7 +348,7 @@ if __name__ == "__main__":
 
     thn.plot_voltages(1/h.dt, anf.get_voltages().T).show()
 
-    print "Spikes:", np.array(anf.spikes)
+    print "Spikes:", anf.get_spikes()
 
 
     print
