@@ -114,7 +114,7 @@ class ANF(object):
         """
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
 
-        train = np.array( (np.array(self._spikes), h.t),
+        train = np.array( [(np.array(self._spikes), h.t)],
                           dtype=[('spikes', np.ndarray),
                                  ('duration', float)] )
 
