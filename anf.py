@@ -329,8 +329,17 @@ class ANF_Axon(ANF):
 
 
 
+def _plot_voltages(voltages):
+    subplt_num = voltages.shape[1]
+    for i,v in enumerate(voltages.T):
+        plt.subplot(subplt_num, 1, i+1)
+        plt.plot(v)
+    plt.show()
+
+
+
 if __name__ == "__main__":
-    import thorns.nrn as thn
+    import matplotlib.pyplot as plt
 
     h.dt = 0.002
     h.celsius = 37
@@ -346,7 +355,7 @@ if __name__ == "__main__":
     anf.ainit()
     neuron.run(10)
 
-    thn.plot_voltages(1/h.dt, anf.get_voltages().T).show()
+    _plot_voltages( anf.get_voltages()[:,0:6] )
 
     print "Spikes:", anf.get_spikes()
 
@@ -381,6 +390,6 @@ if __name__ == "__main__":
     neuron.run(len(stim) * h.dt)
 
     # plot
-    thn.plot_voltages(1/h.dt, anf.get_voltages().T).show()
+    _plot_voltages(anf.get_voltages()[:,0:6])
 
 

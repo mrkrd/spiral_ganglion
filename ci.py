@@ -15,8 +15,6 @@ from electrodes import Electrode
 import neuron
 from neuron import h
 
-import thorns.nrn as thn
-
 
 def _simulate_anf_at( (z, electrodes, return_voltages) ):
 
