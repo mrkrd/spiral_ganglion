@@ -123,7 +123,7 @@ def find_threshold(anf, electrode):
         return spikes
 
     lo = 0
-    hi = 0.2
+    hi = 1
 
     # find initial range: lo/hi
     while not run_sim(hi):
