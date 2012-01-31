@@ -127,6 +127,7 @@ def find_threshold(anf, electrode):
 
     # find initial range: lo/hi
     while not run_sim(hi):
+        print (lo, hi)
         lo = hi
         hi = hi * 2
 
@@ -135,7 +136,7 @@ def find_threshold(anf, electrode):
         amp = (hi+lo)/2
 
         spikes = run_sim(amp)
-        print amp, spikes
+        print (lo, hi), spikes
 
         if spikes:
             hi = amp
