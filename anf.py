@@ -322,6 +322,7 @@ class ANF_Axon(ANF):
         ### Recording voltages from all sections
         self._voltages = []
         if record_voltages:
+            print "Recording voltages is on"
             for sec in self.sections['sec']:
                 vec = h.Vector()
                 vec.record(sec(0.5)._ref_v)

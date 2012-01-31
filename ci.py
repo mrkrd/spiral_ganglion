@@ -102,58 +102,54 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
-def _find_threshold(anf, electrode):
-    stim = electrode.stim
+def find_threshold(anf, electrode):
+    h.dt = 0.002
+
+    stim_orig = electrode.stim
     fs = electrode.fs
+
     anf.electrodes = [electrode]
 
-    def run_sim(fs, stim, amp):
-        electrode.fs = fs
-        electrode.stim = stim * amp
+    def run_sim(amp):
+        electrode.stim = stim_orig * amp
 
         anf.einit()
         neuron.init()
-        tmax = 1000 * len(stim) / fs
+        tmax = 1000 * len(electrode.stim) / electrode.fs
         neuron.run(tmax)
 
-        return len(anf.get_spikes())
+        spikes = anf.get_spikes()['spikes'][0]
+
+        return spikes
 
     lo = 0
     hi = 0.2
 
     # find initial range: lo/hi
-    while run_sim(fs, stim, hi) == 0:
+    while not run_sim(hi):
         lo = hi
         hi = hi * 2
 
     # binary search for amp
     while (hi-lo) > 0.01*(hi+lo)/2:
         amp = (hi+lo)/2
-        # print amp
-        cnt = run_sim(fs, stim, amp)
-        if cnt == 0:
-            lo = amp
-        elif cnt > 0:
+
+        spikes = run_sim(amp)
+        print amp, spikes
+
+        if spikes:
             hi = amp
         else:
-            assert False, "Spike count should never be < 0"
+            lo = amp
 
     # restore original stim
-    electrode.stim = stim
+    electrode.stim = stim_orig
+
     return amp
 
 
 
-def find_threshold(fs, stim):
-    """
-    Binary search of the firing threshold in the standard CI
-    configuration for the given `stim' signal.
-
-    See the function's body to see what `standard configuration' is
-    like.
-
-    """
-    h.dt = 0.002
+def make_anf_electrode(fs, stim):
     h.celsius = 37
 
     electrode = Electrode()
@@ -166,19 +162,22 @@ def find_threshold(fs, stim):
     # anf.set_geometry('bent', a=750, b=500, z=0)
     anf.set_geometry('straight', x0=0, y0=500, z0=0)
 
-    return _find_threshold(anf, electrode)
+    return anf, electrode
+
 
 
 
 def main():
     import thorns as th
 
-    fs = 100000
+    fs = 100e3
     stim = np.zeros(1000)
     stim[300:320] = -0.5
     # stim[5000:5010] = -0.5
 
-    find_threshold(fs, stim)
+    anf, electrode = make_anf_electrode(fs, stim)
+
+    find_threshold(anf, electrode)
     exit()
 
     stim_dict = {6: stim}
