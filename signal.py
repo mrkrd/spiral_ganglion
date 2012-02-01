@@ -11,10 +11,12 @@ def generate_biphaseic_pulse(
         widths,                 # [s, s]
         gap_width,              # s
         polarity='ac',
-        pad_width=[0]):           # s
+        pad_width=[0]):         # s
     """Generate a biphasic pulse used in CI simulations.
 
-    The output pulses will be normalized for the charge of 1e-9C (1nC)
+    The output pulses will be normalized for the charge of 1e-9 C (1nC).
+
+    The output is in [mA].
 
     """
     polarities = {'ac': [+1, -1],
@@ -28,7 +30,7 @@ def generate_biphaseic_pulse(
     assert polarity in polarities
 
 
-    unit_charge = 1e-6          # = 1 uC
+    unit_charge = 1e-9          # = 1 nC
 
 
     amps = unit_charge/2 / widths
@@ -61,6 +63,8 @@ def generate_biphaseic_pulse(
         pad[1]
     ))
 
+
+    signal *= 1e3               # convert: A -> mA
 
     return signal
 
