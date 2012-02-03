@@ -8,10 +8,10 @@ import numpy as np
 
 def generate_biphaseic_pulse(
         fs,                     # Hz
-        widths,                 # [s, s]
-        gap_width,              # s
+        widths,                 # [us, us]
+        gap_width,              # us
         polarity='ac',
-        pad_width=[0]):         # s
+        pad_width=[0]):         # ms
     """Generate a biphasic pulse used in CI simulations.
 
     The output pulses will be normalized for the charge of 1e-9 C (1nC).
@@ -22,8 +22,8 @@ def generate_biphaseic_pulse(
     polarities = {'ac': [+1, -1],
                   'ca': [-1, +1]}
 
-    widths = np.array(widths)
-    pad_width = np.array(pad_width)
+    widths = np.array(widths) * 1e-6 # us -> s
+    pad_width = np.array(pad_width) * 1e-3 # ms -> s
 
     assert widths.size == 2
     assert pad_width.size in (1,2)
