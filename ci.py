@@ -126,7 +126,7 @@ def find_threshold(anf, electrode):
     hi = 1
 
     # find initial range: lo/hi
-    while not run_sim(hi):
+    while run_sim(hi).size == 0:
         print (lo, hi)
         lo = hi
         hi = hi * 2
