@@ -23,6 +23,7 @@ def generate_biphaseic_pulse(
                   'ca': [-1, +1]}
 
     widths = np.array(widths) * 1e-6 # us -> s
+    gap_width = np.array(gap_width) * 1e-6 # us -> s
     pad_width = np.array(pad_width) * 1e-3 # ms -> s
 
     assert widths.size == 2
@@ -53,8 +54,6 @@ def generate_biphaseic_pulse(
     ]
 
 
-
-
     signal = np.concatenate((
         pad[0],
         pulses[0],
@@ -75,11 +74,10 @@ def main():
 
     s = generate_biphaseic_pulse(
         fs=200e3,
-        first_pulse_width=40e-6,
-        second_pulse_width=20e-6,
-        gap_width=10e-6,
+        widths=[40,20],
+        gap_width=20,
         polarity='ca',
-        pad_width=100e-6)
+        pad_width=1)
 
     plt.plot(s)
     plt.show()
