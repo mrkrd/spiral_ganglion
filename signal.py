@@ -6,62 +6,52 @@ __author__ = "Marek Rudnicki"
 
 import numpy as np
 
-def generate_biphaseic_pulse(
+def generate_pulse(
         fs,                     # Hz
-        widths,                 # [us, us]
+        widths,                 # [us, ..., us]
         gap_width,              # us
-        polarity='ac',
-        pad_width=[0]):         # ms
+        polarities,             # e.g. 'ac' where len(polarities) == len(widths)
+        pad_widths=[0]):         # ms
     """Generate a biphasic pulse used in CI simulations.
 
-    The output pulses will be normalized for the charge of 1e-9 C (1nC).
+    Each of the pulses is normalized for the charge of 1e-9 C (1nC).
 
     The output is in [mA].
 
     """
-    polarities = {'ac': [+1, -1],
-                  'ca': [-1, +1]}
+    polarity_map = {'a':+1, 'c':-1}
 
-    widths = np.array(widths) * 1e-6 # us -> s
+    widths = np.array(widths) * 1e-6       # us -> s
     gap_width = np.array(gap_width) * 1e-6 # us -> s
-    pad_width = np.array(pad_width) * 1e-3 # ms -> s
+    pad_widths = np.array(pad_widths) * 1e-3 # ms -> s
 
-    assert widths.size == 2
-    assert pad_width.size in (1,2)
-    assert polarity in polarities
+    assert len(polarities) == len(widths)
+    assert pad_widths.size in (1,2)
 
 
     unit_charge = 1e-9          # = 1 nC
 
 
-    amps = unit_charge/2 / widths
-
     pulses = []
-    for i,width in enumerate(widths):
+    for width,polarity in zip(widths, polarities):
         pulse = np.ones( np.round(width * fs) )
-        pulse *= amps[i]
-        pulse *= polarities[polarity][i]
-
+        pulse *= unit_charge / width # amplitude
+        pulse *= polarity_map[polarity]
         pulses.append( pulse )
 
-    gap = np.zeros( np.round(gap_width * fs) )
+        gap = np.zeros( np.round(gap_width * fs) )
+        pulses.append( gap )
 
-    if pad_width.size == 1:
-        pad_width = np.repeat(pad_width, 2)
-    pad = [
-        np.zeros( np.round(w * fs) )
-        for w in pad_width
-    ]
+    pulses.pop()                # removes the last gap
 
 
-    signal = np.concatenate((
-        pad[0],
-        pulses[0],
-        gap,
-        pulses[1],
-        pad[1]
-    ))
+    if pad_widths.size == 1:
+        pad_widths = np.repeat(pad_widths, 2)
+    pulses.insert(0, np.zeros( np.round(pad_widths[0] * fs) ))
+    pulses.append(np.zeros( np.round(pad_widths[0] * fs) ))
 
+
+    signal = np.concatenate(pulses)
 
     signal *= 1e3               # convert: A -> mA
 
@@ -72,12 +62,13 @@ def generate_biphaseic_pulse(
 
 def main():
 
-    s = generate_biphaseic_pulse(
+    s = generate_pulse(
         fs=200e3,
         widths=[40,20],
         gap_width=20,
-        polarity='ca',
-        pad_width=1)
+        polarities='ca',
+        pad_widths=1
+    )
 
     plt.plot(s)
     plt.show()

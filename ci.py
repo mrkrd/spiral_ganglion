@@ -171,14 +171,22 @@ def make_anf_electrode(fs, stim):
 def main():
     import thorns as th
 
-    fs = 100e3
-    stim = np.zeros(1000)
-    stim[300:320] = -0.5
-    # stim[5000:5010] = -0.5
+    import signals
+
+    fs = 200e3
+    stim = signal.generate_pulse(
+        fs=fs,
+        widths=[40],
+        gap_width=0,
+        polarities='c',
+        pad_widths=[10, 5]
+    )
 
     anf, electrode = make_anf_electrode(fs, stim)
 
-    find_threshold(anf, electrode)
+    th = find_threshold(anf, electrode)
+    print th
+
     exit()
 
     stim_dict = {6: stim}
