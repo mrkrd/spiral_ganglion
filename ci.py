@@ -178,7 +178,7 @@ def main():
         fs=fs,
         widths=[40],
         gap_width=0,
-        polarities='a',
+        polarities='c',
         pad_widths=[10, 5]
     )
 
