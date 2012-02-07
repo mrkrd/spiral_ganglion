@@ -171,14 +171,14 @@ def make_anf_electrode(fs, stim):
 def main():
     import thorns as th
 
-    import signals
+    from signals import generate_pulse
 
     fs = 200e3
-    stim = signal.generate_pulse(
+    stim = generate_pulse(
         fs=fs,
         widths=[40],
         gap_width=0,
-        polarities='c',
+        polarities='a',
         pad_widths=[10, 5]
     )
 
