@@ -15,5 +15,5 @@ from electrodes import Electrode
 
 from ci import run_ci_simulation
 
-import signal
+import signals
 import ci

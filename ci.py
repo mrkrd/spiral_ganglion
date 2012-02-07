@@ -102,7 +102,7 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
-def find_threshold(anf, electrode):
+def find_threshold(anf, electrode, error=0.01):
     h.dt = 0.002
 
     stim_orig = electrode.stim
@@ -132,7 +132,7 @@ def find_threshold(anf, electrode):
         hi = hi * 2
 
     # binary search for amp
-    while (hi-lo) > 0.01*(hi+lo)/2:
+    while (hi-lo) > error*(hi+lo)/2:
         amp = (hi+lo)/2
 
         spikes = run_sim(amp)
