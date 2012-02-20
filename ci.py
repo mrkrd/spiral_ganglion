@@ -102,16 +102,20 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
-def find_threshold(anf, electrode, error=0.01):
-    h.dt = 0.002
+def find_threshold(anf,
+                   electrode,
+                   stimulus,
+                   fs,
+                   pre_stimulus=np.array([]),
+                   error=0.01):
 
-    stim_orig = electrode.stim
-    fs = electrode.fs
+    h.dt = 0.002                # [ms]
 
+    electrode.fs = fs
     anf.electrodes = [electrode]
 
     def run_sim(amp):
-        electrode.stim = stim_orig * amp
+        electrode.stim = np.concatenate( (pre_stimulus, stimulus*amp) )
 
         anf.einit()
         neuron.init()
@@ -143,21 +147,16 @@ def find_threshold(anf, electrode, error=0.01):
         else:
             lo = amp
 
-    # restore original stim
-    electrode.stim = stim_orig
-
     return amp
 
 
 
-def make_anf_electrode(fs, stim):
+def make_anf_electrode():
     h.celsius = 37
 
     electrode = Electrode()
     electrode.x = 300
     electrode.z = 0
-    electrode.stim = stim
-    electrode.fs = fs
 
     anf = ANF_Axon()
     # anf.set_geometry('bent', a=750, b=500, z=0)
@@ -176,15 +175,15 @@ def main():
     fs = 200e3
     stim = generate_pulse(
         fs=fs,
-        widths=[40],
+        widths=[40e-6],
         gap_width=0,
         polarities='c',
-        pad_widths=[10, 5]
+        pad_widths=[10e-3, 5e-3]
     )
 
-    anf, electrode = make_anf_electrode(fs, stim)
+    anf, electrode = make_anf_electrode()
 
-    th = find_threshold(anf, electrode)
+    th = find_threshold(anf, electrode, stimulus=stim, fs=fs)
     print th
 
     exit()

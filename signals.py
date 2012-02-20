@@ -6,12 +6,12 @@ __author__ = "Marek Rudnicki"
 
 import numpy as np
 
-def generate_pulse(
+def generate_pulses(
         fs,                     # Hz
-        widths,                 # [us, ..., us]
-        gap_width,              # us
+        widths,                 # [s, ..., s]
+        gap_width,              # s
         polarities,             # e.g. 'ac' where len(polarities) == len(widths)
-        pad_widths=[0]):         # ms
+        pad_widths=[0]):        # s
     """Generate a biphasic pulse used in CI simulations.
 
     Each of the pulses is normalized for the charge of 1e-9 C (1nC).
@@ -21,9 +21,13 @@ def generate_pulse(
     """
     polarity_map = {'a':+1, 'c':-1}
 
-    widths = np.array(widths) * 1e-6       # us -> s
-    gap_width = np.array(gap_width) * 1e-6 # us -> s
-    pad_widths = np.array(pad_widths) * 1e-3 # ms -> s
+    widths = np.array(widths)
+    gap_width = np.array(gap_width)
+    pad_widths = np.array(pad_widths)
+
+    assert np.all(widths < 10), "Value must be in seconds"
+    assert np.all(gap_width < 10), "Value must be in seconds"
+    assert np.all(pad_widths < 10), "Value must be in seconds"
 
     assert len(polarities) == len(widths)
     assert pad_widths.size in (1,2)
@@ -48,7 +52,7 @@ def generate_pulse(
     if pad_widths.size == 1:
         pad_widths = np.repeat(pad_widths, 2)
     pulses.insert(0, np.zeros( np.round(pad_widths[0] * fs) ))
-    pulses.append(np.zeros( np.round(pad_widths[0] * fs) ))
+    pulses.append(np.zeros( np.round(pad_widths[1] * fs) ))
 
 
     signal = np.concatenate(pulses)
