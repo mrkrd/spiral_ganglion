@@ -107,7 +107,7 @@ def find_threshold(anf,
                    stimulus,
                    fs,
                    pre_stimulus=np.array([]),
-                   error=0.01):
+                   error=0.001):
 
     h.dt = 0.002                # [ms]
 
@@ -142,7 +142,7 @@ def find_threshold(anf,
         spikes = run_sim(amp)
         print (lo, hi), spikes
 
-        if spikes:
+        if spikes.size > 0:
             hi = amp
         else:
             lo = amp
