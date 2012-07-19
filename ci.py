@@ -7,7 +7,6 @@ __author__ = "Marek Rudnicki"
 import numpy as np
 import multiprocessing
 import os
-#import biggles
 
 from anf import ANF_Axon
 from electrodes import Electrode
