@@ -1,5 +1,5 @@
-syntax: glob
 amd64
 x86_64
 *.pyc
 tutorial/out.mat
+tmp
