@@ -38,10 +38,10 @@ class Electrode(object):
 
         ### Calculate decay along cochlea
         gain_dB = -1e3          # [dB/m]: -1dB/mm
-        z = anf._z[0]
-        assert np.all(anf._z == z)
+        z_anf = anf.z[0]
+        assert np.all(anf.z == z_anf)
 
-        exponent = gain_dB * np.abs(self.z - z) / 20
+        exponent = gain_dB * np.abs(self.z - z_anf) / 20
         z_decay_factor = 10**exponent
         stim = z_decay_factor * self.stim
 
@@ -49,7 +49,7 @@ class Electrode(object):
 
         ### Calculate homogenious medium (1/r)
         # resistivity = 300 ohm*cm = 3 ohm*m
-        r = np.sqrt((self.x - anf._x)**2 + (self.y - anf._y)**2)
+        r = np.sqrt((self.x - anf.x)**2 + (self.y - anf.y)**2)
         node_factors = 3 / (4 * np.pi * r)
 
         # import matplotlib.pyplot as plt

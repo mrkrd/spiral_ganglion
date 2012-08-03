@@ -158,7 +158,6 @@ def make_anf_electrode():
 
     electrode = Electrode()
     electrode.x = 300e-6
-    electrode.z = 0
 
     anf = ANF_Axon()
     # anf.set_geometry('bent', a=750, b=500, z=0)

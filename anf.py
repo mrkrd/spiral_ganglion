@@ -59,9 +59,9 @@ class ANF(object):
         Ls = self._get_segment_positions_along_neuron()
 
         if geometry == 'straight':
-            self._x = kwargs['x0'] + Ls
-            self._y = kwargs['y0'] * np.ones(len(Ls))
-            self._z = kwargs['z0'] * np.ones(len(Ls))
+            self.x = kwargs['x0'] + Ls
+            self.y = kwargs['y0'] * np.ones(len(Ls))
+            self.z = kwargs['z0'] * np.ones(len(Ls))
 
         elif geometry == 'bent':
             a = kwargs['a']
@@ -90,9 +90,9 @@ class ANF(object):
             x = np.append(x, a*np.ones(len(sel)))
             y = np.append(y, -sel)
 
-            self._x = x
-            self._y = y
-            self._z = kwargs['z'] * np.ones(len(Ls))
+            self.x = x
+            self.y = y
+            self.z = kwargs['z'] * np.ones(len(Ls))
 
             # import matplotlib.pyplot as plt
             # plt.plot(x,y, 'o')
@@ -166,9 +166,9 @@ class ANF(object):
         if self.electrodes:
             # Make sure that each segment has defined position
             assert (
-                len(self._x) ==
-                len(self._y) ==
-                len(self._z) ==
+                len(self.x) ==
+                len(self.y) ==
+                len(self.z) ==
                 len(self._get_segment_positions_along_neuron())
             )
 
@@ -241,9 +241,9 @@ class ANF_Axon(ANF):
         print "ANF temperature:", h.celsius, "C"
 
         self.vesicles = []      # vesicle timings for acoustical stimulation
-        self._x = None          # array of segment's x coordinate locations
-        self._y = None          # array of segment's y coordinate locations
-        self._z = None          # array of segment's z coordinate locations
+        self.x = None          # array of segment's x coordinate locations
+        self.y = None          # array of segment's y coordinate locations
+        self.z = None          # array of segment's z coordinate locations
 
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)

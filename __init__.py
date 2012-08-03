@@ -13,7 +13,12 @@ neuron.load_mechanisms(lib_dir)
 from anf import ANF_Axon
 from electrodes import Electrode
 
-from ci import run_ci_simulation
+from ci import (
+    run_ci_simulation,
+    make_anf_electrode,
+    find_threshold
+)
+
 
 import signals
 import ci
