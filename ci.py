@@ -25,7 +25,7 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
     h.celsius = 37
 
     anf = ANF_Axon(record_voltages=return_voltages)
-    anf.set_geometry('straight', x0=0, y0=500, z0=z)
+    anf.set_geometry('straight', x0=0, y0=500e-6, z0=z)
 
     anf.electrodes = electrodes
 
@@ -67,7 +67,7 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
     if isinstance(stim, dict):
         for i in stim:
             el = Electrode(i+1)
-            el.x = 300
+            el.x = 300e-6
             el.fs = fs
             el.stim = stim[i]
             electrodes.append(el)
@@ -78,13 +78,13 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
         for i,s in enumerate(stim.T):
             el = Electrode(i+1)
-            el.x = 300
+            el.x = 300e-6
             el.fs = fs
             el.stim = s
             electrodes.append(el)
 
 
-    z_anf = np.linspace(0, 35000, anf_num)
+    z_anf = np.linspace(0, 35e-3, anf_num)
 
     if nproc is None:
         nproc = multiprocessing.cpu_count()
@@ -105,13 +105,16 @@ def find_threshold(anf,
                    electrode,
                    stimulus,
                    fs,
-                   pre_stimulus=np.array([]),
-                   error=0.001):
+                   pre_stimulus=None,
+                   error=1e-6):
 
     h.dt = 0.002                # [ms]
 
     electrode.fs = fs
     anf.electrodes = [electrode]
+
+    if pre_stimulus is None:
+        pre_stimulus = np.array([])
 
     def run_sim(amp):
         electrode.stim = np.concatenate( (pre_stimulus, stimulus*amp) )
@@ -126,7 +129,7 @@ def find_threshold(anf,
         return spikes
 
     lo = 0
-    hi = 1
+    hi = 1e-3
 
     # find initial range: lo/hi
     while run_sim(hi).size == 0:
@@ -154,12 +157,12 @@ def make_anf_electrode():
     h.celsius = 37
 
     electrode = Electrode()
-    electrode.x = 300
+    electrode.x = 300e-6
     electrode.z = 0
 
     anf = ANF_Axon()
     # anf.set_geometry('bent', a=750, b=500, z=0)
-    anf.set_geometry('straight', x0=0, y0=500, z0=0)
+    anf.set_geometry('straight', x0=0, y0=500e-6, z0=0)
 
     return anf, electrode
 
@@ -167,7 +170,12 @@ def make_anf_electrode():
 
 
 def main():
-    import thorns as th
+    import matplotlib.pyplot as plt
+    from anf import plot_geometry
+    anf, electrode = make_anf_electrode()
+
+    plot_geometry( [anf,electrode] )
+    plt.show()
 
     from signals import generate_pulse
 
@@ -180,7 +188,6 @@ def main():
         pad_widths=[10e-3, 5e-3]
     )
 
-    anf, electrode = make_anf_electrode()
 
     th = find_threshold(anf, electrode, stimulus=stim, fs=fs)
     print th

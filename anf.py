@@ -5,11 +5,11 @@ from __future__ import division
 __author__ = "Marek Rudnicki"
 
 import numpy as np
-from scipy.interpolate import interp1d
 
 import neuron
 from neuron import h
 
+from electrodes import Electrode
 
 class ANF(object):
     def _Tf(self, q10, temp_ref=22):
@@ -23,20 +23,24 @@ class ANF(object):
             segments.extend([sec(i) for i in idx])
         return segments
 
-    def _get_segment_positions(self):
-        """ Returns a list of positions of all segments along the neuron in um """
-        pos = []                # vector of segment's positions
-        start = 0               # position of the beginning of the
-                                # current section
+    def _get_segment_positions_along_neuron(self):
+        """Returns a list of positions of all segments along the
+        neuron in [m]
+
+        """
+        positions = []
+        start = 0               # beginning of the currenct section
         for sec in self.sections['sec']:
-            seg_x = np.array([seg.x for seg in sec])
-            pos.extend(start + seg_x*sec.L)
-            start = start + sec.L
+            seg_x = np.array([seg.x for seg in sec]) # [1]
+            positions.extend(start + seg_x*1e-6*sec.L) # um -> m
+            start = start + 1e-6*sec.L                 # um -> m
 
-        return np.array(pos)
+        positions = np.array(positions)
+
+        return positions
 
 
-    def set_geometry(self, geo_type, **kwargs):
+    def set_geometry(self, geometry, **kwargs):
         """
         Sets position of each segment of the neuron.
 
@@ -52,41 +56,43 @@ class ANF(object):
         z: position along cochlea
 
         """
-        if geo_type == 'straight':
-            self._x = kwargs['x0'] + self._get_segment_positions()
-            self._y = kwargs['y0'] * np.ones(len(self._get_segment_positions()))
-            self._z = kwargs['z0'] * np.ones(len(self._get_segment_positions()))
+        Ls = self._get_segment_positions_along_neuron()
 
-        elif geo_type == 'bent':
+        if geometry == 'straight':
+            self._x = kwargs['x0'] + Ls
+            self._y = kwargs['y0'] * np.ones(len(Ls))
+            self._z = kwargs['z0'] * np.ones(len(Ls))
+
+        elif geometry == 'bent':
             a = kwargs['a']
             b = kwargs['b']
             z = kwargs['z']
             r = b
             shift = np.abs(a-b)
 
-            L = self._get_segment_positions()
+
             circumference = 2 * np.pi * r
             quarter = circumference / 4
 
 
             # Initial straight segment
-            sel = L[ (L<shift) ]
+            sel = Ls[ (Ls<shift) ]
             x = sel
             y = b * np.ones(len(sel))
 
             # Quarter circle segment
-            sel = L[ (L>=shift) & (L<(quarter+shift)) ] - shift
+            sel = Ls[ (Ls>=shift) & (Ls<(quarter+shift)) ] - shift
             x = np.append(x, shift + r*np.sin(2 * np.pi * sel / circumference))
             y = np.append(y, r*np.cos(2 * np.pi * sel / circumference))
 
             # Remaining straight segment
-            sel = L[ (L>=(quarter+shift)) ] - shift - quarter
+            sel = Ls[ (Ls>=(quarter+shift)) ] - shift - quarter
             x = np.append(x, a*np.ones(len(sel)))
             y = np.append(y, -sel)
 
             self._x = x
             self._y = y
-            self._z = kwargs['z'] * np.ones(len(L))
+            self._z = kwargs['z'] * np.ones(len(Ls))
 
             # import matplotlib.pyplot as plt
             # plt.plot(x,y, 'o')
@@ -104,6 +110,9 @@ class ANF(object):
         """
         voltages = [np.asarray(vec) for vec in self._voltages]
         voltages = np.array(voltages).T
+
+        voltages *= 1e-3        # mV -> V
+
         return voltages
 
 
@@ -114,9 +123,11 @@ class ANF(object):
         """
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
 
-        train = np.array( [(np.array(self._spikes), h.t)],
-                          dtype=[('spikes', np.ndarray),
-                                 ('duration', float)] )
+        train = np.array(
+            [(1e-3*np.array(self._spikes), 1e-3*h.t)], # ms -> s
+            dtype=[('spikes', np.ndarray),
+                   ('duration', float)]
+            )
 
         return train
 
@@ -154,19 +165,27 @@ class ANF(object):
         self._stim_vectors = []
         if self.electrodes:
             # Make sure that each segment has defined position
-            assert len(self._x) == len(self._y) == len(self._z) == \
-                len(self._get_segment_positions())
+            assert (
+                len(self._x) ==
+                len(self._y) ==
+                len(self._z) ==
+                len(self._get_segment_positions_along_neuron())
+            )
 
             # Make sure all electrodes have signals of the same fs
             fss = np.array([el.fs for el in self.electrodes])
-            assert np.all(fss == fss[0])
-            el_dt = float(1000/fss[0])
-            assert fss[0] is not None
+            fs = fss[0]
+            assert fs is not None
+            assert np.all(fss == fs)
+            el_dt = float(1000/fs) # Hz -> ms
 
-            potentials = sum([el.calculate_potentials(self) for el in self.electrodes])
+            potentials = sum([
+                el.calculate_potentials(self) for el in self.electrodes
+            ])
+
 
             for pot,seg in zip(potentials, self._get_segments()):
-                vec = h.Vector(pot)
+                vec = h.Vector(pot*1e3) # V -> mV
                 vec.play(seg._ref_e_extracellular, el_dt)
                 self._stim_vectors.append(vec)
 
@@ -331,12 +350,64 @@ class ANF_Axon(ANF):
 
 
 def _plot_voltages(voltages):
-    subplt_num = voltages.shape[1]
-    for i,v in enumerate(voltages.T):
-        plt.subplot(subplt_num, 1, i+1)
-        plt.plot(v)
-    plt.show()
 
+    import matplotlib.pyplot as plt
+
+    fig,axes = plt.subplots(voltages.shape[1], 1)
+
+    for v,a in zip(voltages.T, axes):
+        a.plot(v)
+
+
+
+def plot_geometry(objects):
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure()
+
+    for obj in objects:
+        if isinstance(obj, Electrode):
+            fmt = 'k*'
+            x = obj.x
+            y = obj.y
+            z = obj.z
+
+        elif isinstance (obj, ANF):
+            fmt = 'ko'
+            x = obj._x
+            y = obj._y
+            z = obj._z
+
+
+        _plot_object(x,y,z,fmt, fig)
+
+
+
+def _plot_object(x,y,z,fmt, fig):
+
+    xy = fig.add_subplot(221)
+    xy.plot(x,y,fmt)
+    xy.set_title("XY")
+    xy.set_xlabel("X [m]")
+    xy.set_ylabel("Y [m]")
+    xy.set_aspect('equal', 'datalim')
+
+
+
+    zy = fig.add_subplot(222, sharey=xy)
+    zy.plot(z,y,fmt)
+    zy.set_title("ZY")
+    zy.set_xlabel("Z [m]")
+    zy.set_ylabel("Y [m]")
+    zy.set_aspect('equal', 'datalim')
+
+
+    xz = fig.add_subplot(223, sharex=xy)
+    xz.plot(x,z,fmt)
+    xz.set_title("XZ")
+    xz.set_xlabel("X [m]")
+    xz.set_ylabel("Z [m]")
+    xz.set_aspect('equal', 'datalim')
 
 
 if __name__ == "__main__":
@@ -368,18 +439,18 @@ if __name__ == "__main__":
 
     # set ANF
     anf = ANF_Axon(record_voltages=True)
-    # anf.set_geometry('straight', x0=250, y0=500, z0=0)
-    anf.set_geometry('bent', a=750, b=500, z=0)
+    # anf.set_geometry('straight', x0=250e-6, y0=500e-6, z0=0)
+    anf.set_geometry('bent', a=750e-6, b=500e-6, z=0)
 
     # set electrode
     el = Electrode()
     el.z = 0
 
-    stim = np.zeros(1000)
-    stim[280:300] = -0.5
-    stim[300:320] = 0.5
+    fs = 200e3                  # [Hz]
+    stim = np.zeros(20e-3 * fs)
+    stim[np.round(5e-3*fs):np.round(6e-3*fs)] = -0.5e-3 # [A]
 
-    el.fs = 200000
+    el.fs = fs
     el.stim = stim
 
     # `connect' ANF and electrode
@@ -391,6 +462,11 @@ if __name__ == "__main__":
     neuron.run(len(stim) * h.dt)
 
     # plot
+    print anf.get_spikes()
     _plot_voltages(anf.get_voltages()[:,0:6])
 
 
+
+
+    plot_geometry( [anf,el] )
+    plt.show()

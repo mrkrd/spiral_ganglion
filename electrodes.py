@@ -15,15 +15,17 @@ class Electrode(object):
         """
         el_num: electrode number (1-12)
         """
-        self.x = 300            # um
-        self.y = 0              # um
-        self.z = None           # um
+        self.x = 300e-6         # [m]
+        self.y = 0              # [m]
 
-        self.stim = None        # mA
-        self.fs = None          # Hz
+        self.stim = None        # [A]
+        self.fs = None          # [Hz]
 
         if el_num is not None:
-            self.z = np.linspace(4600, 31000, 12)[el_num-1]
+            self.z = np.linspace(4.6e-3, 31e-3, 12)[el_num-1]
+        else:
+            self.z = 0          # [m]
+
 
     def calculate_potentials(self, anf):
         """
@@ -33,22 +35,30 @@ class Electrode(object):
         assert self.stim is not None, "Stimulus must be set."
         assert self.fs is not None, "Sampling frequency must be set."
 
+
         ### Calculate decay along cochlea
-        gain_dB = -1            # -1dB / mm
-        assert np.all(anf._z == anf._z[0])
-        exponent = gain_dB * np.abs(self.z - anf._z[0]) / 1000 / 20
-        z_decay = 10**exponent
-        stim = z_decay * self.stim
+        gain_dB = -1e3          # [dB/m]: -1dB/mm
+        z = anf._z[0]
+        assert np.all(anf._z == z)
+
+        exponent = gain_dB * np.abs(self.z - z) / 20
+        z_decay_factor = 10**exponent
+        stim = z_decay_factor * self.stim
+
+
 
         ### Calculate homogenious medium (1/r)
+        # resistivity = 300 ohm*cm = 3 ohm*m
         r = np.sqrt((self.x - anf._x)**2 + (self.y - anf._y)**2)
-        node_factors = 300 * 1e4 / (4 * np.pi * r)
+        node_factors = 3 / (4 * np.pi * r)
 
         # import matplotlib.pyplot as plt
         # plt.plot(node_factors)
         # plt.show()
 
-        return np.outer(node_factors, stim)
+        potentials = np.outer(node_factors, stim)
+
+        return potentials
 
 
 def main():
