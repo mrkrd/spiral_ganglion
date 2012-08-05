@@ -101,12 +101,14 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
-def find_threshold(anf,
-                   electrode,
-                   stimulus,
-                   fs,
-                   pre_stimulus=None,
-                   error=1e-6):
+def find_threshold(
+        anf,
+        electrode,
+        stimulus,
+        fs,
+        pre_stimulus=None,
+        error=1e-6,
+        debug=True):
 
     h.dt = 0.002                # [ms]
 
@@ -133,7 +135,8 @@ def find_threshold(anf,
 
     # find initial range: lo/hi
     while run_sim(hi).size == 0:
-        print (lo, hi)
+        if debug:
+            print (lo, hi)
         lo = hi
         hi = hi * 2
 
@@ -142,7 +145,8 @@ def find_threshold(anf,
         amp = (hi+lo)/2
 
         spikes = run_sim(amp)
-        print (lo, hi), spikes
+        if debug:
+            print (lo, hi), spikes
 
         if spikes.size > 0:
             hi = amp

@@ -222,11 +222,13 @@ class ANF_Axon(ANF):
     neuron.run(60)
 
     """
-    def __init__(self,
-                 nodes=20,
-                 na_type='rothman93',
-                 gna=0.324,
-                 record_voltages=False):
+    def __init__(
+            self,
+            nodes=20,
+            na_type='rothman93',
+            gna=0.324,
+            record_voltages=False,
+            debug=True):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
 
@@ -238,7 +240,8 @@ class ANF_Axon(ANF):
                          get_voltages()
 
         """
-        print "ANF temperature:", h.celsius, "C"
+        if debug:
+            print "ANF temperature:", h.celsius, "C"
 
         self.vesicles = []      # vesicle timings for acoustical stimulation
         self.x = None          # array of segment's x coordinate locations
