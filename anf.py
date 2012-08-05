@@ -374,9 +374,9 @@ def plot_geometry(objects):
 
         elif isinstance (obj, ANF):
             fmt = 'ko'
-            x = obj._x
-            y = obj._y
-            z = obj._z
+            x = obj.x
+            y = obj.y
+            z = obj.z
 
 
         _plot_object(x,y,z,fmt, fig)
