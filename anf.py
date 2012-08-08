@@ -238,7 +238,9 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        gna=0.324
+        ena = 66
+        ek = -88
+        gna = 0.324
 
         sections = []
 
@@ -249,20 +251,27 @@ class ANF_Axon(ANF):
         term.Ra = 100
         term.diam = 1.5
         term.cm = 0.9
+
         term.insert('leak_manis')
         term.g_leak_manis = 1e-5
 
-        term.insert('na_rothman93')
-        term.gnabar_na_rothman93 = gna
+        term.insert('na_schwarz1987')
+        term.gnabar_na_schwarz1987 = gna
 
-        term.insert('kht_manis')
-        term.gkhtbar_kht_manis = 0.105
+        term.insert('k_schwarz1987')
+        term.gkbar_k_schwarz1987 = 0.105
+
         term.insert('klt_manis')
         term.gkltbar_klt_manis = 0.027
         term.insert('ih_manis')
         term.ghbar_ih_manis = 0.016
         term.insert('extracellular')
+
+        term.ena = ena
+        term.ek = ek
+
         sections.append( ('p_term', term) )
+
 
         ### Peripherial Axon Nodes and Internodes
         for i in range(nodes):
@@ -277,6 +286,7 @@ class ANF_Axon(ANF):
             inode.g_leak_manis = 1e-5
 
             inode.insert('extracellular')
+
             sections.append( ('p_inode', inode) )
 
 
@@ -292,11 +302,12 @@ class ANF_Axon(ANF):
             node.insert('leak_manis')
             node.g_leak_manis = 1e-5
 
-            node.insert('na_rothman93')
-            node.gnabar_na_rothman93 = gna
+            node.insert('na_schwarz1987')
+            node.gnabar_na_schwarz1987 = gna
 
-            node.insert('kht_manis')
-            node.gkhtbar_kht_manis = 0.105
+            node.insert('k_schwarz1987')
+            node.gkbar_k_schwarz1987 = 0.105
+
             node.insert('klt_manis')
             node.gkltbar_klt_manis = 0.027
 
@@ -304,6 +315,10 @@ class ANF_Axon(ANF):
             node.ghbar_ih_manis = 0.016
 
             node.insert('extracellular')
+
+            node.ena = ena
+            node.ek = ek
+
             sections.append( ('p_node', node) )
 
 
@@ -349,7 +364,12 @@ def _plot_voltages(voltages):
 
     import matplotlib.pyplot as plt
 
-    fig,axes = plt.subplots(voltages.shape[1], 1)
+    fig,axes = plt.subplots(
+        voltages.shape[1],
+        1,
+        sharex=True,
+        sharey=True
+    )
 
     for v,a in zip(voltages.T, axes):
         a.plot(v)

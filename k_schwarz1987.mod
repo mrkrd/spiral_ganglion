@@ -1,6 +1,6 @@
 
 NEURON {
-    SUFFIX k_mino2004
+    SUFFIX k_schwarz1987
     USEION k READ ek WRITE ik
     RANGE gkbar, ik
     GLOBAL ninf, ntau
@@ -45,17 +45,19 @@ DERIVATIVE states {
 }
 
 FUNCTION nalpha(v(mV)) (/ms) {
-    LOCAL Tf
-    Tf = 3^((celsius - 37(degC))/10(degC))
+    LOCAL Tf, vm
+    Tf = 3.0^((celsius - 20(degC))/10(degC))
+    vm = v + 78
 
-    nalpha  = 0.129 * Tf * expM1( (35.0-v), 10.0 )
+    nalpha  = 0.02 * Tf * expM1( (35.0-vm), 10.0 )
 }
 
 FUNCTION nbeta(v(mV)) (/ms) {
-    LOCAL Tf
-    Tf = 3^((celsius - 37(degC))/10(degC))
+    LOCAL Tf, vm
+    Tf = 3.0^((celsius - 20(degC))/10(degC))
+    vm = v + 78
 
-    nbeta = 0.3236 * Tf * expM1( (v-35.0), 10.0 )
+    nbeta = 0.05 * Tf * expM1( (vm-10.0), 10.0 )
 }
 
 FUNCTION expM1(x,y) {
