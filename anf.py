@@ -15,13 +15,16 @@ class ANF(object):
     def _Tf(self, q10, temp_ref=22):
         return q10 ** ((h.celsius - temp_ref)/10)
 
+
     def _get_segments(self):
         """ Returns list of all segments along the neuron """
+        sections = self.sections['sec']
         segments = []
-        for sec in self.sections['sec']:
+        for sec in sections:
             idx = [seg.x for seg in sec]
             segments.extend([sec(i) for i in idx])
         return segments
+
 
     def _get_segment_positions_along_neuron(self):
         """Returns a list of positions of all segments along the
@@ -149,15 +152,14 @@ class ANF(object):
 
 
 
-    def einit(self, do_assert=True):
+    def einit(self, dt_assert=0.002, active_nodes=15):
         """
         Initializes electrical stimulation.
 
         Note: must be called *before* neuron.init()
 
         """
-        if do_assert:
-            assert h.dt <= 0.002
+        assert h.dt <= dt_assert
 
         for sec in self.sections['sec']:
             sec.v = -60
@@ -216,7 +218,7 @@ class ANF_Axon(ANF):
     """
     def __init__(
             self,
-            nodes=20,
+            nodes=15,
             record_voltages=False,
             debug=True):
         """nodes: number of nodes in the model.  Total number of
@@ -229,6 +231,7 @@ class ANF_Axon(ANF):
         """
         if debug:
             print "ANF temperature:", h.celsius, "C"
+
 
         self.vesicles = []      # vesicle timings for acoustical stimulation
         self.x = None          # array of segment's x coordinate locations
