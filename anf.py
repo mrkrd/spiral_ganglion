@@ -464,7 +464,7 @@ if __name__ == "__main__":
 
     fs = 200e3                  # [Hz]
     stim = np.zeros(20e-3 * fs)
-    stim[np.round(5e-3*fs):np.round(6e-3*fs)] = -0.5e-3 # [A]
+    stim[np.round(5e-3*fs):np.round(6e-3*fs)] = -0.1e-3 # [A]
 
     el.fs = fs
     el.stim = stim
