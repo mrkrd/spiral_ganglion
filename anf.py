@@ -198,24 +198,16 @@ class ANF_Axon(ANF):
     Model of Auditory Nerve Fiber's peripherial axon.  Can be used
     for acoustical and electrical stimulation.
 
-    Initially has be described by Paul Wilhem Bade in his Master's
-    Thesis.  This implementation includes modified Na+ channels
-    (Rothman 1993) that correct refractory period in acoustical
-    stimulation.  Na+ maximum conductance has also been changed (1
-    S/cm2 -> 0.3 S/cm2).
-
     anf = ANF_Axon()
 
-    Acoustical stimulation
-    ======================
+    ### Acoustical stimulation
     anf.vesicles = [12, 24, 55]
     neuron.init()
     anf.ainit()
     neuron.run(60)
 
 
-    Electrical stimulation
-    ======================
+    ### Electrical stimulation
     anf.electrodes = [electrode1, electrode2, electrode3]
     anf.einit()
     neuron.init()
@@ -225,15 +217,10 @@ class ANF_Axon(ANF):
     def __init__(
             self,
             nodes=20,
-            na_type='rothman93',
-            gna=0.324,
             record_voltages=False,
             debug=True):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
-
-        na_type: 'rothman93'/'orig' specifies which Na+ channel should
-                 be used for the simulation
 
         record_voltages: when True membrane potentials are recorded
                          internally and can be returned with
@@ -251,6 +238,8 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
+        gna=0.324
+
         sections = []
 
         ### Peripherial Axon Terminal
@@ -262,12 +251,10 @@ class ANF_Axon(ANF):
         term.cm = 0.9
         term.insert('leak_manis')
         term.g_leak_manis = 1e-5
-        if na_type == 'rothman93':
-            term.insert('na_rothman93')
-            term.gnabar_na_rothman93 = gna
-        elif na_type == 'orig':
-            term.insert('na_manis')
-            term.gnabar_na_manis = gna
+
+        term.insert('na_rothman93')
+        term.gnabar_na_rothman93 = gna
+
         term.insert('kht_manis')
         term.gkhtbar_kht_manis = 0.105
         term.insert('klt_manis')
@@ -285,10 +272,15 @@ class ANF_Axon(ANF):
             inode.Ra = 100
             inode.diam = 1.5
             inode.cm = 1e-3
+
             inode.insert('leak_manis')
             inode.g_leak_manis = 1e-5
+
             inode.insert('extracellular')
             sections.append( ('p_inode', inode) )
+
+
+
 
             node = h.Section()
             node.nseg = 1
@@ -296,20 +288,21 @@ class ANF_Axon(ANF):
             node.Ra = 100
             node.diam = 1.5
             node.cm = 0.9
+
             node.insert('leak_manis')
             node.g_leak_manis = 1e-5
-            if na_type == 'rothman93':
-                node.insert('na_rothman93')
-                node.gnabar_na_rothman93 = gna
-            elif na_type == 'orig':
-                node.insert('na_manis')
-                node.gnabar_na_manis = gna
+
+            node.insert('na_rothman93')
+            node.gnabar_na_rothman93 = gna
+
             node.insert('kht_manis')
             node.gkhtbar_kht_manis = 0.105
             node.insert('klt_manis')
             node.gkltbar_klt_manis = 0.027
+
             node.insert('ih_manis')
             node.ghbar_ih_manis = 0.016
+
             node.insert('extracellular')
             sections.append( ('p_node', node) )
 
