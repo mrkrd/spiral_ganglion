@@ -5,6 +5,7 @@ from __future__ import division
 __author__ = "Marek Rudnicki"
 
 import neuron
+from neuron import h
 
 import os
 lib_dir = os.path.dirname(__file__)
@@ -22,3 +23,17 @@ from ci import (
 
 import signals
 import ci
+
+
+def run(tmax):
+    neuron.run(tmax * 1e3)      # s -> ms
+
+
+def init(anfs):
+    for anf in anfs:
+        anf.einit()
+
+    neuron.init()
+
+    for anf in anfs:
+        anf.ainit()
