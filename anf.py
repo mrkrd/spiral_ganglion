@@ -244,6 +244,7 @@ class ANF_Axon(ANF):
         ena = 66
         ek = -88
         gna = 0.324
+        gpas = 1e-5
 
         sections = []
 
@@ -255,8 +256,8 @@ class ANF_Axon(ANF):
         term.diam = 1.5
         term.cm = 0.9
 
-        term.insert('leak_manis')
-        term.g_leak_manis = 1e-5
+        term.insert('pas')
+        term.g_pas = gpas
 
         term.insert('na_schwarz1987')
         term.gnabar_na_schwarz1987 = gna
@@ -285,8 +286,8 @@ class ANF_Axon(ANF):
             inode.diam = 1.5
             inode.cm = 1e-3
 
-            inode.insert('leak_manis')
-            inode.g_leak_manis = 1e-5
+            inode.insert('pas')
+            inode.g_pas = gpas
 
             inode.insert('extracellular')
 
@@ -302,8 +303,8 @@ class ANF_Axon(ANF):
             node.diam = 1.5
             node.cm = 0.9
 
-            node.insert('leak_manis')
-            node.g_leak_manis = 1e-5
+            node.insert('pas')
+            node.g_pas = gpas
 
             node.insert('na_schwarz1987')
             node.gnabar_na_schwarz1987 = gna
