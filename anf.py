@@ -11,9 +11,14 @@ from neuron import h
 
 from electrodes import Electrode
 
+
+def calc_tf(q10, temp_ref=22):
+    tf = q10 ** ((h.celsius - temp_ref)/10)
+    return tf
+
+
+
 class ANF(object):
-    def _Tf(self, q10, temp_ref=22):
-        return q10 ** ((h.celsius - temp_ref)/10)
 
 
     def _get_segments(self):
@@ -352,12 +357,12 @@ class ANF_Axon(ANF):
 
         ### IHC Synapse
         self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
-        self._syn.tau1 = 0.399806796048 / self._Tf(q10=2.4)
-        self._syn.tau2 = 0.399889764048 / self._Tf(q10=2.4)
+        self._syn.tau1 = 0.399806796048 / calc_tf(q10=2.4)
+        self._syn.tau2 = 0.399889764048 / calc_tf(q10=2.4)
         assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * self._Tf(q10=1.5262)
+        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5262)
         self._con.delay = 0
 
         ### Recording spikes from the last section
@@ -514,10 +519,10 @@ if __name__ == "__main__":
     capacity = 0.0714e-12
 
     print
-    print "g_Na", anf.sections['sec'][0].gnabar_na_schwarz1987
-    print "g_Kv", anf.sections['sec'][0].gkbar_k_schwarz1987
+    print "g_Na ", anf.sections['sec'][0].gnabar_na_schwarz1987
+    print "g_Kv ", anf.sections['sec'][0].gkbar_k_schwarz1987
     print "g_Klt", anf.sections['sec'][0].gkltbar_klt_manis
-    print "g_h", anf.sections['sec'][0].ghbar_ih_manis
+    print "g_h  ", anf.sections['sec'][0].ghbar_ih_manis
     print "g_pas", anf.sections['sec'][0].g_pas
     print
 
