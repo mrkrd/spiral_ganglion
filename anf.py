@@ -145,14 +145,14 @@ class ANF(object):
         assert h.dt <= 0.01
 
         for sec in self.sections['sec']:
-            sec.v = -60
+            sec.v = self.resting_pot
 
         for v in self.vesicles:
             self._con.event(float(v))
 
 
 
-    def einit(self, dt_assert=0.002, active_nodes=15):
+    def einit(self, dt_assert=0.002):
         """
         Initializes electrical stimulation.
 
@@ -162,7 +162,7 @@ class ANF(object):
         assert h.dt <= dt_assert
 
         for sec in self.sections['sec']:
-            sec.v = -60
+            sec.v = self.resting_pot
 
         self._stim_vectors = []
         if self.electrodes:
@@ -218,7 +218,7 @@ class ANF_Axon(ANF):
     """
     def __init__(
             self,
-            nodes=15,
+            nodes=20,
             record_voltages=False,
             debug=True):
         """nodes: number of nodes in the model.  Total number of
@@ -233,18 +233,27 @@ class ANF_Axon(ANF):
             print "ANF temperature:", h.celsius, "C"
 
 
-        self.vesicles = []      # vesicle timings for acoustical stimulation
-        self.x = None          # array of segment's x coordinate locations
-        self.y = None          # array of segment's y coordinate locations
-        self.z = None          # array of segment's z coordinate locations
+        self.vesicles = [] # vesicle timings for acoustical stimulation
+        self.x = None      # array of segment's x coordinate locations
+        self.y = None      # array of segment's y coordinate locations
+        self.z = None      # array of segment's z coordinate locations
 
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
+        self.resting_pot = -60
         ena = 66
         ek = -88
-        gna = 0.324
-        gpas = 1e-5
+        epas = -78
+
+        capacity = 0.0714e-12
+        g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
+        g_kv = calc_conductivity_cm2(50.0e-12, capacity) * 166
+        g_klt = calc_conductivity_cm2(13.0e-12, capacity) * 166
+        g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
+        g_pas = 1e-5 #calc_conductivity_cm2(1/1953.49e6, capacity)
+
+
 
         sections = []
 
@@ -257,22 +266,25 @@ class ANF_Axon(ANF):
         term.cm = 0.9
 
         term.insert('pas')
-        term.g_pas = gpas
+        term.g_pas = g_pas
 
         term.insert('na_schwarz1987')
-        term.gnabar_na_schwarz1987 = gna
+        term.gnabar_na_schwarz1987 = g_na
 
         term.insert('k_schwarz1987')
-        term.gkbar_k_schwarz1987 = 0.105
+        term.gkbar_k_schwarz1987 = g_kv
 
         term.insert('klt_manis')
-        term.gkltbar_klt_manis = 0.027
+        term.gkltbar_klt_manis = g_klt
+
         term.insert('ih_manis')
-        term.ghbar_ih_manis = 0.016
+        term.ghbar_ih_manis = g_h
+
         term.insert('extracellular')
 
         term.ena = ena
         term.ek = ek
+        term.e_pas = epas
 
         sections.append( ('p_term', term) )
 
@@ -287,7 +299,8 @@ class ANF_Axon(ANF):
             inode.cm = 1e-3
 
             inode.insert('pas')
-            inode.g_pas = gpas
+            inode.g_pas = g_pas
+            inode.e_pas = epas
 
             inode.insert('extracellular')
 
@@ -304,24 +317,25 @@ class ANF_Axon(ANF):
             node.cm = 0.9
 
             node.insert('pas')
-            node.g_pas = gpas
+            node.g_pas = g_pas
 
             node.insert('na_schwarz1987')
-            node.gnabar_na_schwarz1987 = gna
+            node.gnabar_na_schwarz1987 = g_na
 
             node.insert('k_schwarz1987')
-            node.gkbar_k_schwarz1987 = 0.105
+            node.gkbar_k_schwarz1987 = g_kv
 
             node.insert('klt_manis')
-            node.gkltbar_klt_manis = 0.027
+            node.gkltbar_klt_manis = g_klt
 
             node.insert('ih_manis')
-            node.ghbar_ih_manis = 0.016
+            node.ghbar_ih_manis = g_h
 
             node.insert('extracellular')
 
             node.ena = ena
             node.ek = ek
+            node.e_pas = epas
 
             sections.append( ('p_node', node) )
 
@@ -329,7 +343,7 @@ class ANF_Axon(ANF):
 
         self.sections = np.rec.fromrecords(sections, names='typ,sec')
         for sec in self.sections['sec']:
-            sec.v = -60
+            sec.v = self.resting_pot
 
         # Connect sections
         for prev,next in zip(self.sections['sec'][:-1], self.sections['sec'][1:]):
@@ -361,6 +375,18 @@ class ANF_Axon(ANF):
                 vec = h.Vector()
                 vec.record(sec(0.5)._ref_v)
                 self._voltages.append(vec)
+
+
+
+
+
+def calc_conductivity_cm2(conductance, capacity):
+    cm = 0.9e-6                 # [F/cm2]
+    area = capacity / cm        # [cm2]
+
+    conductivity = conductance / area # [S/cm2]
+    return conductivity
+
 
 
 
@@ -480,6 +506,24 @@ if __name__ == "__main__":
     anf.einit()
     neuron.init()
     neuron.run(len(stim) * h.dt)
+
+
+
+
+    ### Conductances
+    capacity = 0.0714e-12
+
+    print
+    print "g_Na", anf.sections['sec'][0].gnabar_na_schwarz1987
+    print "g_Kv", anf.sections['sec'][0].gkbar_k_schwarz1987
+    print "g_Klt", anf.sections['sec'][0].gkltbar_klt_manis
+    print "g_h", anf.sections['sec'][0].ghbar_ih_manis
+    print "g_pas", anf.sections['sec'][0].g_pas
+    print
+
+
+
+
 
     # plot
     print anf.get_spikes()
