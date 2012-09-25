@@ -11,7 +11,11 @@ import os
 lib_dir = os.path.dirname(__file__)
 neuron.load_mechanisms(lib_dir)
 
-from anf import ANF_Axon
+from anf import (
+    ANF_Axon,
+    plot_geometry
+)
+
 from electrodes import Electrode
 
 from ci import (
@@ -37,3 +41,11 @@ def init(anfs):
 
     for anf in anfs:
         anf.ainit()
+
+
+def set_celsius(celsius):
+    h.celsius = celsius
+
+
+def set_fs(fs):
+    h.dt = 1e3/fs
