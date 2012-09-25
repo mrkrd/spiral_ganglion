@@ -135,7 +135,7 @@ def find_threshold(
 
 
     lo = 0
-    hi = 1e-3
+    hi = 1e-4
 
     # find initial range: lo/hi
     while _run_single_electrode(anf, electrode, hi, stimulus, pre_stimulus).size == 0:
