@@ -535,7 +535,5 @@ if __name__ == "__main__":
     _plot_voltages(anf.get_voltages()[:,0:6])
 
 
-    print h.vrest_k_schwarz1987
-
-    # plot_geometry( [anf,el] )
-    # plt.show()
+    plot_geometry( [anf,el] )
+    plt.show()

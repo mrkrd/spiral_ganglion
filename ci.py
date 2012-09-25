@@ -101,6 +101,20 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
+def _run_find_threshold_simulation(anf, el, amp):
+    electrode.stim = np.concatenate( (pre_stimulus, stimulus*amp) )
+
+    anf.einit()
+    neuron.init()
+    tmax = 1000 * len(electrode.stim) / electrode.fs
+    neuron.run(tmax)
+
+    spikes = anf.get_spikes()['spikes'][0]
+
+    return spikes
+
+
+
 def find_threshold(
         anf,
         electrode,
@@ -118,23 +132,12 @@ def find_threshold(
     if pre_stimulus is None:
         pre_stimulus = np.array([])
 
-    def run_sim(amp):
-        electrode.stim = np.concatenate( (pre_stimulus, stimulus*amp) )
-
-        anf.einit()
-        neuron.init()
-        tmax = 1000 * len(electrode.stim) / electrode.fs
-        neuron.run(tmax)
-
-        spikes = anf.get_spikes()['spikes'][0]
-
-        return spikes
 
     lo = 0
     hi = 1e-3
 
     # find initial range: lo/hi
-    while run_sim(hi).size == 0:
+    while _run_find_threshold_simulation(anf, electrode, hi).size == 0:
         if debug:
             print (lo, hi)
         lo = hi
@@ -144,7 +147,7 @@ def find_threshold(
     while (hi-lo) > error*(hi+lo)/2:
         amp = (hi+lo)/2
 
-        spikes = run_sim(amp)
+        spikes = _run_find_threshold_simulation(anf, electrode, amp)
         if debug:
             print (lo, hi), spikes
 
