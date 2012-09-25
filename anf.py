@@ -246,7 +246,7 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        self._vrest = -70
+        self._vrest = -60
         ena = 66
         ek = -88
         epas = -78
