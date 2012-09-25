@@ -14,6 +14,7 @@ UNITS {
 
 PARAMETER {
     gkbar=.120 (mho/cm2) <0,1e9>
+    vrest=78. (mV)
 }
 
 STATE {
@@ -45,19 +46,17 @@ DERIVATIVE states {
 }
 
 FUNCTION nalpha(v(mV)) (/ms) {
-    LOCAL Tf, vm
+    LOCAL Tf
     Tf = 3.0^((celsius - 20(degC))/10(degC))
-    vm = v + 78
 
-    nalpha  = 0.02 * Tf * expM1( (35.0-vm), 10.0 )
+    nalpha  = 0.02 * Tf * expM1( (35.0-v), 10.0 )
 }
 
 FUNCTION nbeta(v(mV)) (/ms) {
-    LOCAL Tf, vm
+    LOCAL Tf
     Tf = 3.0^((celsius - 20(degC))/10(degC))
-    vm = v + 78
 
-    nbeta = 0.05 * Tf * expM1( (vm-10.0), 10.0 )
+    nbeta = 0.05 * Tf * expM1( (v-10.0), 10.0 )
 }
 
 FUNCTION expM1(x,y) {
@@ -68,8 +67,12 @@ FUNCTION expM1(x,y) {
     }
 }
 
-PROCEDURE rates(v(mV)) {LOCAL a, b
+PROCEDURE rates(v(mV)) {
+    LOCAL vm
     TABLE ninf, ntau DEPEND celsius FROM -100 TO 100 WITH 200
-    ntau = 1/(nalpha(v) + nbeta(v))
-    ninf = nalpha(v)/(nalpha(v) + nbeta(v))
+
+    vm = v + vrest
+
+    ntau = 1/(nalpha(vm) + nbeta(vm))
+    ninf = nalpha(vm)/(nalpha(vm) + nbeta(vm))
 }
