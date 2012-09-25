@@ -3,7 +3,7 @@ NEURON {
     SUFFIX na_schwarz1987
     USEION na READ ena WRITE ina
     RANGE gnabar, ina
-    GLOBAL minf, hinf, mtau, htau
+    GLOBAL minf, hinf, mtau, htau, vrest
     THREADSAFE
 }
 
@@ -88,7 +88,7 @@ PROCEDURE rates(v(mV)) {
     LOCAL vm
     TABLE minf, hinf, mtau, htau DEPEND celsius FROM -100 TO 100 WITH 200
 
-    vm = v + vrest
+    vm = v - vrest
 
     mtau = 1/(malpha(vm) + mbeta(vm))
     minf = malpha(vm)/(malpha(vm) + mbeta(vm))

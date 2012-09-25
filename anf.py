@@ -150,7 +150,7 @@ class ANF(object):
         assert h.dt <= 0.01
 
         for sec in self.sections['sec']:
-            sec.v = self.resting_pot
+            sec.v = self._vrest
 
         for v in self.vesicles:
             self._con.event(float(v))
@@ -167,7 +167,7 @@ class ANF(object):
         assert h.dt <= dt_assert
 
         for sec in self.sections['sec']:
-            sec.v = self.resting_pot
+            sec.v = self._vrest
 
         self._stim_vectors = []
         if self.electrodes:
@@ -246,7 +246,7 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        self.resting_pot = -60
+        self._vrest = -70
         ena = 66
         ek = -88
         epas = -78
@@ -348,7 +348,7 @@ class ANF_Axon(ANF):
 
         self.sections = np.rec.fromrecords(sections, names='typ,sec')
         for sec in self.sections['sec']:
-            sec.v = self.resting_pot
+            sec.v = self._vrest
 
         # Connect sections
         for prev,next in zip(self.sections['sec'][:-1], self.sections['sec'][1:]):
@@ -535,7 +535,7 @@ if __name__ == "__main__":
     _plot_voltages(anf.get_voltages()[:,0:6])
 
 
+    print h.vrest_k_schwarz1987
 
-
-    plot_geometry( [anf,el] )
-    plt.show()
+    # plot_geometry( [anf,el] )
+    # plt.show()

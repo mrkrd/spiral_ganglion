@@ -3,7 +3,7 @@ NEURON {
     SUFFIX k_schwarz1987
     USEION k READ ek WRITE ik
     RANGE gkbar, ik
-    GLOBAL ninf, ntau
+    GLOBAL ninf, ntau, vrest
     THREADSAFE
 }
 
@@ -71,7 +71,7 @@ PROCEDURE rates(v(mV)) {
     LOCAL vm
     TABLE ninf, ntau DEPEND celsius FROM -100 TO 100 WITH 200
 
-    vm = v + vrest
+    vm = v - vrest
 
     ntau = 1/(nalpha(vm) + nbeta(vm))
     ninf = nalpha(vm)/(nalpha(vm) + nbeta(vm))
