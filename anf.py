@@ -39,7 +39,7 @@ class ANF(object):
         positions = []
         start = 0               # beginning of the currenct section
         for sec in self.sections['sec']:
-            seg_x = np.array([seg.x for seg in sec]) # [1]
+            seg_x = np.array([seg.x for seg in sec])   # [1]
             positions.extend(start + seg_x*1e-6*sec.L) # um -> m
             start = start + 1e-6*sec.L                 # um -> m
 
@@ -277,7 +277,7 @@ class ANF_Axon(ANF):
         term.gnabar_na_rothman93 = g_na
 
         term.insert('kht_manis')
-        term.gkbar_kht_manis = g_kv
+        term.gkhtbar_kht_manis = g_kv
 
         term.insert('klt_manis')
         term.gkltbar_klt_manis = g_klt
@@ -328,7 +328,7 @@ class ANF_Axon(ANF):
             node.gnabar_na_rothman93 = g_na
 
             node.insert('kht_manis')
-            node.gkbar_kht_manis = g_kv
+            node.gkhtbar_kht_manis = g_kv
 
             node.insert('klt_manis')
             node.gkltbar_klt_manis = g_klt
@@ -499,7 +499,7 @@ if __name__ == "__main__":
 
     fs = 200e3                  # [Hz]
     stim = np.zeros(20e-3 * fs)
-    stim[np.round(5e-3*fs):np.round(6e-3*fs)] = -0.1e-3 # [A]
+    stim[np.round(5e-3*fs):np.round(6e-3*fs)] = -0.2e-3 # [A]
 
     el.fs = fs
     el.stim = stim
@@ -520,7 +520,7 @@ if __name__ == "__main__":
 
     print
     print "g_Na ", anf.sections['sec'][0].gnabar_na_rothman93
-    print "g_Kv ", anf.sections['sec'][0].gkbar_kht_manis
+    print "g_Kv ", anf.sections['sec'][0].gkhtbar_kht_manis
     print "g_Klt", anf.sections['sec'][0].gkltbar_klt_manis
     print "g_h  ", anf.sections['sec'][0].ghbar_ih_manis
     print "g_pas", anf.sections['sec'][0].g_pas
