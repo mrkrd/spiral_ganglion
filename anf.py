@@ -273,11 +273,11 @@ class ANF_Axon(ANF):
         term.insert('pas')
         term.g_pas = g_pas
 
-        term.insert('na_schwarz1987')
-        term.gnabar_na_schwarz1987 = g_na
+        term.insert('na_rothman93')
+        term.gnabar_na_rothman93 = g_na
 
-        term.insert('k_schwarz1987')
-        term.gkbar_k_schwarz1987 = g_kv
+        term.insert('kht_manis')
+        term.gkbar_kht_manis = g_kv
 
         term.insert('klt_manis')
         term.gkltbar_klt_manis = g_klt
@@ -324,11 +324,11 @@ class ANF_Axon(ANF):
             node.insert('pas')
             node.g_pas = g_pas
 
-            node.insert('na_schwarz1987')
-            node.gnabar_na_schwarz1987 = g_na
+            node.insert('na_rothman93')
+            node.gnabar_na_rothman93 = g_na
 
-            node.insert('k_schwarz1987')
-            node.gkbar_k_schwarz1987 = g_kv
+            node.insert('kht_manis')
+            node.gkbar_kht_manis = g_kv
 
             node.insert('klt_manis')
             node.gkltbar_klt_manis = g_klt
@@ -519,8 +519,8 @@ if __name__ == "__main__":
     capacity = 0.0714e-12
 
     print
-    print "g_Na ", anf.sections['sec'][0].gnabar_na_schwarz1987
-    print "g_Kv ", anf.sections['sec'][0].gkbar_k_schwarz1987
+    print "g_Na ", anf.sections['sec'][0].gnabar_na_rothman93
+    print "g_Kv ", anf.sections['sec'][0].gkbar_kht_manis
     print "g_Klt", anf.sections['sec'][0].gkltbar_klt_manis
     print "g_h  ", anf.sections['sec'][0].ghbar_ih_manis
     print "g_pas", anf.sections['sec'][0].g_pas
