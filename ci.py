@@ -101,9 +101,25 @@ def run_ci_simulation(fs, stim, anf_num=10, nproc=None, return_voltages=False):
 
 
 
-def _run_single_electrode(anf, electrode, amplitude, stimulus, pre_stimulus):
+def _run_single_electrode(
+        anf,
+        electrode,
+        amplitude,
+        stimulus,
+        fs,
+        pre_stimulus,
+        pad):
 
-    electrode.stim = np.concatenate( (pre_stimulus, stimulus*amplitude) )
+    if pad:
+        pre_pad = np.zeros(10e-3 * fs)
+        post_pad = np.zeros(5e-3 * fs)
+    else:
+        pre_pad = np.array([])
+        post_pad = np.array([])
+
+    electrode.stim = np.concatenate(
+        (pre_pad, pre_stimulus, stimulus*amplitude, post_pad)
+    )
 
     anf.einit()
     neuron.init()
@@ -122,6 +138,7 @@ def find_threshold(
         stimulus,
         fs,
         pre_stimulus=None,
+        pad=False,
         error=1e-6,
         debug=True):
 
@@ -138,22 +155,38 @@ def find_threshold(
     hi = 1e-4
 
     # find initial range: lo/hi
-    while _run_single_electrode(anf, electrode, hi, stimulus, pre_stimulus).size == 0:
+    while True:
+        spikes = _run_single_electrode(
+            anf=anf,
+            electrode=electrode,
+            amplitude=hi,
+            stimulus=stimulus,
+            fs=fs,
+            pre_stimulus=pre_stimulus,
+            pad=pad
+        )
+        if spikes.size > 0:
+            break
+
         if debug:
             print (lo, hi)
+
         lo = hi
         hi = hi * 2
+
 
     # binary search for amp
     while (hi-lo) > error*(hi+lo)/2:
         amp = (hi+lo)/2
 
         spikes = _run_single_electrode(
-            anf,
-            electrode,
-            amp,
-            stimulus,
-            pre_stimulus
+            anf=anf,
+            electrode=electrode,
+            amplitude=amp,
+            stimulus=stimulus,
+            fs=fs,
+            pre_stimulus=pre_stimulus,
+            pad=pad
         )
 
         if debug:
