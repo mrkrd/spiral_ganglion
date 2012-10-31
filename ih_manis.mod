@@ -31,7 +31,7 @@ PARAMETER {
     dt (ms)
     ghbar = 0.00318 (mho/cm2) <0,1e9>
     eh = -43 (mV)
-    vrest = 64. (mV)
+    vrest = -64. (mV)
 }
 
 STATE {
