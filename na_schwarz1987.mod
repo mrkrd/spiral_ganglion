@@ -13,8 +13,8 @@ UNITS {
 }
 
 PARAMETER {
-    gnabar=.120 (mho/cm2) <0,1e9>
-    vrest=-78. (mV)
+    gnabar = .120 (mho/cm2) <0,1e9>
+    vrest = -78. (mV)
 }
 
 STATE {

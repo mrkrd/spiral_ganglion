@@ -1,6 +1,5 @@
-
 NEURON {
-    SUFFIX na_rothman93
+    SUFFIX na_rothman1993
     USEION na READ ena WRITE ina
     RANGE gnabar, ina
     GLOBAL minf, hinf, mtau, htau
@@ -50,6 +49,7 @@ DERIVATIVE states {
 FUNCTION malpha(v(mV)) (/ms) {
     LOCAL Tf
     Tf = 3^((celsius - 22(degC))/10(degC))
+
     malpha = 0.36 * Tf * expM1( -(v+49), 3 )
     :malpha = 0.36 * Tf * (v + 49) / (1 - exp(-(v+49)/3))
 }
@@ -57,20 +57,23 @@ FUNCTION malpha(v(mV)) (/ms) {
 FUNCTION mbeta(v(mV)) (/ms) {
     LOCAL Tf
     Tf = 3^((celsius - 22(degC))/10(degC))
+
     mbeta = 0.4 * Tf * expM1( (v+58), 20 )
     :mbeta = -0.4 * Tf * (v + 58) / (1 - exp((v+58)/20))
 }
 
 FUNCTION halpha(v(mV)) (/ms) {
-    LOCAL Tf, T10
+    LOCAL Tf, Tf10
     Tf = 3^((celsius - 22(degC))/10(degC))
-    T10 = 10^((celsius - 22(degC))/10(degC))
-    halpha = 2.4 * Tf / (1 + exp((v+68)/3))  +  0.8 * T10 / (1 + exp(v+61.3))
+    Tf10 = 10^((celsius - 22(degC))/10(degC))
+
+    halpha = 2.4 * Tf / (1 + exp((v+68.)/3.))  +  0.8 * Tf10 / (1 + exp(v+61.3))
 }
 
 FUNCTION hbeta(v(mV)) (/ms) {
     LOCAL Tf
     Tf = 3^((celsius - 22(degC))/10(degC))
+
     hbeta = 3.6 * Tf / (1 + exp(-(v+21)/10))
 }
 
@@ -82,8 +85,9 @@ FUNCTION expM1(x,y) {
     }
 }
 
-PROCEDURE rates(v(mV)) {LOCAL a, b
+PROCEDURE rates(v(mV)) {
     TABLE minf, hinf, mtau, htau DEPEND celsius FROM -100 TO 100 WITH 200
+
     mtau = 1/(malpha(v) + mbeta(v))
     minf = malpha(v)/(malpha(v) + mbeta(v))
 
