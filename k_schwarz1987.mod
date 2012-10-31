@@ -13,8 +13,8 @@ UNITS {
 }
 
 PARAMETER {
-    gkbar=.120 (mho/cm2) <0,1e9>
-    vrest=-78. (mV)
+    gkbar = .120 (mho/cm2) <0,1e9>
+    vrest = -78. (mV)
 }
 
 STATE {
