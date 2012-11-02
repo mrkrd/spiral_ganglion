@@ -246,7 +246,7 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        self._vrest = -60
+        self._vrest = -78
         ena = 66
         ek = -88
         epas = -78
@@ -273,17 +273,17 @@ class ANF_Axon(ANF):
         term.insert('pas')
         term.g_pas = g_pas
 
-        term.insert('na_rothman1993')
-        term.gnabar_na_rothman1993 = g_na
+        term.insert('na_schwarz1987')
+        term.gnabar_na_schwarz1987 = g_na
 
-        term.insert('kht_manis')
-        term.gkhtbar_kht_manis = g_kv
+        term.insert('k_schwarz1987')
+        term.gkbar_k_schwarz1987 = g_kv
 
-        term.insert('klt_manis')
-        term.gkltbar_klt_manis = g_klt
+        term.insert('klt_rothman2003')
+        term.gkltbar_klt_rothman2003 = g_klt
 
-        term.insert('ih_manis')
-        term.ghbar_ih_manis = g_h
+        term.insert('ih_rothman2003')
+        term.ghbar_ih_rothman2003 = g_h
 
         term.insert('extracellular')
 
@@ -324,17 +324,18 @@ class ANF_Axon(ANF):
             node.insert('pas')
             node.g_pas = g_pas
 
-            node.insert('na_rothman1993')
-            node.gnabar_na_rothman1993 = g_na
 
-            node.insert('kht_manis')
-            node.gkhtbar_kht_manis = g_kv
+            node.insert('na_schwarz1987')
+            node.gnabar_na_schwarz1987 = g_na
 
-            node.insert('klt_manis')
-            node.gkltbar_klt_manis = g_klt
+            node.insert('k_schwarz1987')
+            node.gkbar_k_schwarz1987 = g_kv
 
-            node.insert('ih_manis')
-            node.ghbar_ih_manis = g_h
+            node.insert('klt_rothman2003')
+            node.gkltbar_klt_rothman2003 = g_klt
+
+            node.insert('ih_rothman2003')
+            node.ghbar_ih_rothman2003 = g_h
 
             node.insert('extracellular')
 
@@ -345,10 +346,15 @@ class ANF_Axon(ANF):
             sections.append( ('p_node', node) )
 
 
+        h.vrest_na_schwarz1987 = self._vrest
+        h.vrest_k_schwarz1987 = self._vrest
+        h.vrest_klt_rothman2003 = self._vrest
+        h.vrest_ih_rothman2003 = self._vrest
 
         self.sections = np.rec.fromrecords(sections, names='typ,sec')
         for sec in self.sections['sec']:
             sec.v = self._vrest
+
 
         # Connect sections
         for prev,next in zip(self.sections['sec'][:-1], self.sections['sec'][1:]):
@@ -362,8 +368,9 @@ class ANF_Axon(ANF):
         assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5262)
+        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.6)
         self._con.delay = 0
+
 
         ### Recording spikes from the last section
         last = self.sections['sec'][-1]
@@ -519,10 +526,10 @@ if __name__ == "__main__":
     capacity = 0.0714e-12
 
     print
-    print "g_Na ", anf.sections['sec'][0].gnabar_na_rothman1993
-    print "g_Kv ", anf.sections['sec'][0].gkhtbar_kht_manis
-    print "g_Klt", anf.sections['sec'][0].gkltbar_klt_manis
-    print "g_h  ", anf.sections['sec'][0].ghbar_ih_manis
+    print "g_Na ", anf.sections['sec'][0].gnabar_na_schwarz1987
+    print "g_Kv ", anf.sections['sec'][0].gkbar_k_schwarz1987
+    print "g_Klt", anf.sections['sec'][0].gkltbar_klt_rothman2003
+    print "g_h  ", anf.sections['sec'][0].ghbar_ih_rothman2003
     print "g_pas", anf.sections['sec'][0].g_pas
     print
 

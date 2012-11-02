@@ -1,4 +1,3 @@
-
 NEURON {
     SUFFIX na_schwarz1987
     USEION na READ ena WRITE ina
