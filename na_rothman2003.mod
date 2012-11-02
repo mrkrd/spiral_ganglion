@@ -1,4 +1,4 @@
-TITLE klt.mod  The low threshold conductance of cochlear nucleus neurons
+TITLE na_rothman.mod  The low threshold conductance of cochlear nucleus neurons
 
 COMMENT
 
@@ -25,7 +25,7 @@ UNITS {
 }
 
 NEURON {
-        SUFFIX na_manis
+        SUFFIX na_rothman2003
         USEION na READ ena WRITE ina
         RANGE gnabar, gna, ina
         GLOBAL hinf, minf, htau, mtau

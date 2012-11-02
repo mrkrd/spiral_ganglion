@@ -1,4 +1,4 @@
-TITLE ih_manis.mod  VCN conductances
+TITLE ih_rothman2003.mod  VCN conductances
 
 COMMENT
 Ih for VCN neurons - average from several studies in auditory neurons
@@ -18,7 +18,7 @@ UNITS {
 }
 
 NEURON {
-    SUFFIX ih_manis
+    SUFFIX ih_rothman2003
     NONSPECIFIC_CURRENT i
     RANGE ghbar, ih
     GLOBAL rinf, rtau, vrest

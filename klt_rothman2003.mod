@@ -1,4 +1,4 @@
-TITLE klt_manis.mod  The low threshold conductance of cochlear nucleus neurons
+TITLE klt_rothman2003.mod  The low threshold conductance of cochlear nucleus neurons
 
 COMMENT
 
@@ -38,7 +38,7 @@ UNITS {
 }
 
 NEURON {
-    SUFFIX klt_manis
+    SUFFIX klt_rothman2003
     USEION k READ ek WRITE ik
     RANGE gkltbar, ik
     GLOBAL winf, zinf, wtau, ztau, vrest
