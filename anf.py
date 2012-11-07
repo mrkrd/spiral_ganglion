@@ -5,6 +5,7 @@ from __future__ import division
 __author__ = "Marek Rudnicki"
 
 import numpy as np
+import pandas as pd
 
 import neuron
 from neuron import h
@@ -131,11 +132,11 @@ class ANF(object):
         """
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
 
-        train = np.array(
-            [(1e-3*np.array(self._spikes), 1e-3*h.t)], # ms -> s
-            dtype=[('spikes', np.ndarray),
-                   ('duration', float)]
-            )
+        train = pd.DataFrame([{
+            'spikes': 1e-3*np.array(self._spikes),
+            'duration': 1e-3*h.t,
+            'type': 'anf'
+        }])
 
         return train
 
