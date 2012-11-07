@@ -200,6 +200,46 @@ class ANF(object):
 
 
 
+def _get_conductances(name):
+    capacity = 0.0714e-12
+
+    g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
+    g_kv = calc_conductivity_cm2(50.0e-12, capacity) * 166
+    g_klt = calc_conductivity_cm2(13.0e-12, capacity) * 166
+    g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
+    g_pas = 1e-5 #calc_conductivity_cm2(1/1953.49e6, capacity)
+
+
+    if name == 'schwarz1987':
+        channel_cfg = [
+            ('terminal', 'na_schwarz1987', 'gnabar', g_na),
+            ('terminal', 'k_schwarz1987', 'gkbar', g_kv),
+            ('terminal', 'klt_rothman2003', 'gkltbar', g_klt),
+            ('terminal', 'ih_rothman2003', 'ghbar', g_h),
+            ('terminal', 'pas', 'g', g_pas),
+
+            ('internode', 'pas', 'g', g_pas),
+
+            ('node', 'na_schwarz1987', 'gnabar', g_na),
+            ('node', 'k_schwarz1987', 'gkbar', g_kv),
+            ('node', 'klt_rothman2003', 'gkltbar', g_klt),
+            ('node', 'ih_rothman2003', 'ghbar', g_h),
+            ('node', 'pas', 'g', g_pas)
+        ]
+        channel_cfg = pd.DataFrame(
+            channel_cfg,
+            columns=['section', 'channel', 'conductance' 'value']
+        )
+
+    else:
+        raise RuntimeError("Unknown channel config name: {}".format(name))
+
+
+
+
+
+
+
 
 class ANF_Axon(ANF):
     """
@@ -226,6 +266,7 @@ class ANF_Axon(ANF):
             self,
             nodes=20,
             record_voltages=False,
+            channels='schwarz1987'
             debug=True):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -252,21 +293,13 @@ class ANF_Axon(ANF):
         ek = -88
         epas = -78
 
-        capacity = 0.0714e-12
-        g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
-        g_kv = calc_conductivity_cm2(50.0e-12, capacity) * 166
-        g_klt = calc_conductivity_cm2(13.0e-12, capacity) * 166
-        g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
-        g_pas = 1e-5 #calc_conductivity_cm2(1/1953.49e6, capacity)
-
-
 
         sections = []
 
         ### Peripherial Axon Terminal
         term = h.Section()
         term.nseg = 1
-        term.L = 1
+        term.L = 10
         term.Ra = 100
         term.diam = 1.5
         term.cm = 0.9
@@ -292,7 +325,7 @@ class ANF_Axon(ANF):
         term.ek = ek
         term.e_pas = epas
 
-        sections.append( ('p_term', term) )
+        sections.append( ('terminal', term) )
 
 
         ### Peripherial Axon Nodes and Internodes
@@ -310,7 +343,7 @@ class ANF_Axon(ANF):
 
             inode.insert('extracellular')
 
-            sections.append( ('p_inode', inode) )
+            sections.append( ('internode', inode) )
 
 
 
@@ -344,7 +377,7 @@ class ANF_Axon(ANF):
             node.ek = ek
             node.e_pas = epas
 
-            sections.append( ('p_node', node) )
+            sections.append( ('node', node) )
 
 
         h.vrest_na_schwarz1987 = self._vrest
