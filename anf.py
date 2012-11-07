@@ -266,7 +266,7 @@ class ANF_Axon(ANF):
         ### Peripherial Axon Terminal
         term = h.Section()
         term.nseg = 1
-        term.L = 10
+        term.L = 1
         term.Ra = 100
         term.diam = 1.5
         term.cm = 0.9
