@@ -200,7 +200,7 @@ class ANF(object):
 
 
 
-def _get_conductances(name):
+def make_config(name):
     capacity = 0.0714e-12
 
     g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
@@ -211,33 +211,31 @@ def _get_conductances(name):
 
 
     if name == 'schwarz1987':
-        channel_cfg = [
-            ('terminal', 'na_schwarz1987', 'gnabar', g_na),
-            ('terminal', 'k_schwarz1987', 'gkbar', g_kv),
-            ('terminal', 'klt_rothman2003', 'gkltbar', g_klt),
-            ('terminal', 'ih_rothman2003', 'ghbar', g_h),
-            ('terminal', 'pas', 'g', g_pas),
+        cfg = pd.DataFrame([
+            {'loc':'node', 'channel':'na_schwarz1987', 'var':'gnabar', 'value':g_na},
+            {'loc':'node', 'channel':'k_schwarz1987', 'var':'gkbar', 'value':g_kv},
+            {'loc':'node', 'channel':'klt_rothman2003', 'var':'gkltbar', 'value':g_klt},
+            {'loc':'node', 'channel':'ih_rothman2003', 'var':'ghbar', 'value':g_h},
+            {'loc':'node', 'channel':'pas', 'var':'g', 'value':g_pas},
+            {'loc':'internode', 'channel':'pas', 'var':'g', 'value':g_pas},
+            {'var':'vrest', 'value':-78}
+        ])
+    elif name == 'rothman1993':
+        cfg = pd.DataFrame([
+            {'loc':'node', 'channel':'na_rothman1993', 'var':'gnabar', 'value':g_na},
+            {'loc':'node', 'channel':'kht_rothman2003', 'var':'gkhtbar', 'value':g_kv},
+            {'loc':'node', 'channel':'klt_rothman2003', 'var':'gkltbar', 'value':g_klt},
+            {'loc':'node', 'channel':'ih_rothman2003', 'var':'ghbar', 'value':g_h},
+            {'loc':'node', 'channel':'pas', 'var':'g', 'value':g_pas},
+            {'loc':'internode', 'channel':'pas', 'var':'g', 'value':g_pas},
+            {'var':'vrest', 'value':-64}
+        ])
 
-            ('internode', 'pas', 'g', g_pas),
-
-            ('node', 'na_schwarz1987', 'gnabar', g_na),
-            ('node', 'k_schwarz1987', 'gkbar', g_kv),
-            ('node', 'klt_rothman2003', 'gkltbar', g_klt),
-            ('node', 'ih_rothman2003', 'ghbar', g_h),
-            ('node', 'pas', 'g', g_pas)
-        ]
-        channel_cfg = pd.DataFrame(
-            channel_cfg,
-            columns=['section', 'channel', 'conductance' 'value']
-        )
 
     else:
         raise RuntimeError("Unknown channel config name: {}".format(name))
 
-
-
-
-
+    return cfg
 
 
 
@@ -266,7 +264,7 @@ class ANF_Axon(ANF):
             self,
             nodes=20,
             record_voltages=False,
-            channels='schwarz1987'
+            channels='schwarz1987',
             debug=True):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -295,6 +293,9 @@ class ANF_Axon(ANF):
 
 
         sections = []
+
+        for i in range(nodes):
+
 
         ### Peripherial Axon Terminal
         term = h.Section()
