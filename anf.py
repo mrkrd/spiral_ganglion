@@ -6,12 +6,15 @@ __author__ = "Marek Rudnicki"
 
 import numpy as np
 import pandas as pd
+import logging
 
 import neuron
 from neuron import h
 
 from electrodes import Electrode
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def calc_tf(q10, temp_ref=22):
     tf = q10 ** ((h.celsius - temp_ref)/10)
@@ -209,27 +212,89 @@ def make_config(name):
     g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
     g_pas = 1e-5 #calc_conductivity_cm2(1/1953.49e6, capacity)
 
+    ena = 66
+    ek = -88
+    e_pas = -78
+
+    cfg = {}
+    cfg['internode_channels'] = [
+        'pas',
+        'extracellular'
+    ]
+    cfg['internode_vars'] = {
+        'nseg': 1,
+        'L': 250,
+        'Ra': 100,
+        'diam': 1.5,
+        'cm': 1e-3,
+        'g_pas': g_pas,
+        'e_pas': e_pas
+    }
 
     if name == 'schwarz1987':
-        cfg = pd.DataFrame([
-            {'loc':'node', 'channel':'na_schwarz1987', 'var':'gnabar', 'value':g_na},
-            {'loc':'node', 'channel':'k_schwarz1987', 'var':'gkbar', 'value':g_kv},
-            {'loc':'node', 'channel':'klt_rothman2003', 'var':'gkltbar', 'value':g_klt},
-            {'loc':'node', 'channel':'ih_rothman2003', 'var':'ghbar', 'value':g_h},
-            {'loc':'node', 'channel':'pas', 'var':'g', 'value':g_pas},
-            {'loc':'internode', 'channel':'pas', 'var':'g', 'value':g_pas},
-            {'var':'vrest', 'value':-78}
-        ])
+
+        cfg['node_channels'] = [
+            'na_schwarz1987',
+            'k_schwarz1987',
+            'klt_rothman2003',
+            'ih_rothman2003',
+            'pas',
+            'extracellular'
+        ]
+        cfg['node_vars'] = {
+            'nseg': 1,
+            'L': 1,
+            'Ra': 100,
+            'diam': 1.5,
+            'cm': 0.9,
+            'gnabar_na_schwarz1987': g_na,
+            'gkbar_k_schwarz1987': g_kv,
+            'gkltbar_klt_rothman2003': g_klt,
+            'ghbar_ih_rothman2003': g_h,
+            'g_pas': g_pas,
+            'ena': ena,
+            'ek': ek,
+            'e_pas': e_pas
+        }
+        cfg['global_vars'] = {
+            'vrest_na_schwarz1987': -78,
+            'vrest_k_schwarz1987': -78,
+            'vrest_klt_rothman2003': -78,
+            'vrest_ih_rothman2003': -78
+        }
+        cfg['vrest'] = -78
+
     elif name == 'rothman1993':
-        cfg = pd.DataFrame([
-            {'loc':'node', 'channel':'na_rothman1993', 'var':'gnabar', 'value':g_na},
-            {'loc':'node', 'channel':'kht_rothman2003', 'var':'gkhtbar', 'value':g_kv},
-            {'loc':'node', 'channel':'klt_rothman2003', 'var':'gkltbar', 'value':g_klt},
-            {'loc':'node', 'channel':'ih_rothman2003', 'var':'ghbar', 'value':g_h},
-            {'loc':'node', 'channel':'pas', 'var':'g', 'value':g_pas},
-            {'loc':'internode', 'channel':'pas', 'var':'g', 'value':g_pas},
-            {'var':'vrest', 'value':-64}
-        ])
+
+        cfg['node_channels'] = [
+            'na_rothman1993',
+            'kht_rothman2003',
+            'klt_rothman2003',
+            'ih_rothman2003',
+            'pas'
+        ]
+        cfg['node_vars'] = {
+            'nseg': 1,
+            'L': 1,
+            'Ra': 100,
+            'diam': 1.5,
+            'cm': 0.9,
+            'gnabar_na_rothman1993': g_na,
+            'gkhtbar_kht_rothman2003': g_kv,
+            'gkltbar_klt_rothman2003': g_klt,
+            'ih_rothman2003': g_h,
+            'g_pas': g_pas,
+            'ena': ena,
+            'ek': ek,
+            'e_pas': e_pas
+        }
+        cfg['global_vars'] = {
+            'vrest_na_rothman1993': -64,
+            'vrest_kht_rothman2003': -64,
+            'vrest_klt_rothman2003': -64,
+            'vrest_ih_rothman2003': -64
+        }
+        cfg['vrest'] = -64
 
 
     else:
@@ -265,7 +330,8 @@ class ANF_Axon(ANF):
             nodes=20,
             record_voltages=False,
             channels='schwarz1987',
-            debug=True):
+            terminal_lenght=10
+    ):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
 
@@ -274,8 +340,7 @@ class ANF_Axon(ANF):
                          get_voltages()
 
         """
-        if debug:
-            print "ANF temperature:", h.celsius, "C"
+        logger.info("ANF temperature: {} C".format(h.celsius))
 
 
         self.vesicles = [] # vesicle timings for acoustical stimulation
@@ -286,118 +351,59 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        self._vrest = -78
-        ena = 66
-        ek = -88
-        epas = -78
+        if isinstance(channels, str):
+            cfg = make_config(channels)
+
+        else:
+            cfg = channels
+
 
 
         sections = []
-
         for i in range(nodes):
+            ### Node sections
+            sec = h.Section()
+
+            for chan in cfg['node_channels']:
+                sec.insert(chan)
+            for var,val in cfg['node_vars'].items():
+                setattr(sec, var, val)
+
+            sections.append(('node', sec))
 
 
-        ### Peripherial Axon Terminal
-        term = h.Section()
-        term.nseg = 1
-        term.L = 10
-        term.Ra = 100
-        term.diam = 1.5
-        term.cm = 0.9
+            ### Internode sections
+            sec = h.Section()
 
-        term.insert('pas')
-        term.g_pas = g_pas
+            for chan in cfg['internode_channels']:
+                sec.insert(chan)
+            for var,val in cfg['internode_vars'].items():
+                setattr(sec, var, val)
 
-        term.insert('na_schwarz1987')
-        term.gnabar_na_schwarz1987 = g_na
-
-        term.insert('k_schwarz1987')
-        term.gkbar_k_schwarz1987 = g_kv
-
-        term.insert('klt_rothman2003')
-        term.gkltbar_klt_rothman2003 = g_klt
-
-        term.insert('ih_rothman2003')
-        term.ghbar_ih_rothman2003 = g_h
-
-        term.insert('extracellular')
-
-        term.ena = ena
-        term.ek = ek
-        term.e_pas = epas
-
-        sections.append( ('terminal', term) )
+            sections.append(('internode', sec))
 
 
-        ### Peripherial Axon Nodes and Internodes
-        for i in range(nodes):
-            inode = h.Section()
-            inode.nseg = 1
-            inode.L = 250
-            inode.Ra = 100
-            inode.diam = 1.5
-            inode.cm = 1e-3
+        sections = np.rec.fromrecords(sections, names=['type', 'sec'])
 
-            inode.insert('pas')
-            inode.g_pas = g_pas
-            inode.e_pas = epas
-
-            inode.insert('extracellular')
-
-            sections.append( ('internode', inode) )
+        for var,val in cfg['global_vars'].items():
+            setattr(h, var, val)
 
 
+        ### Terminal node
+        sections['sec'][0].L = 10
 
 
-            node = h.Section()
-            node.nseg = 1
-            node.L = 1
-            node.Ra = 100
-            node.diam = 1.5
-            node.cm = 0.9
-
-            node.insert('pas')
-            node.g_pas = g_pas
-
-
-            node.insert('na_schwarz1987')
-            node.gnabar_na_schwarz1987 = g_na
-
-            node.insert('k_schwarz1987')
-            node.gkbar_k_schwarz1987 = g_kv
-
-            node.insert('klt_rothman2003')
-            node.gkltbar_klt_rothman2003 = g_klt
-
-            node.insert('ih_rothman2003')
-            node.ghbar_ih_rothman2003 = g_h
-
-            node.insert('extracellular')
-
-            node.ena = ena
-            node.ek = ek
-            node.e_pas = epas
-
-            sections.append( ('node', node) )
-
-
-        h.vrest_na_schwarz1987 = self._vrest
-        h.vrest_k_schwarz1987 = self._vrest
-        h.vrest_klt_rothman2003 = self._vrest
-        h.vrest_ih_rothman2003 = self._vrest
-
-        self.sections = np.rec.fromrecords(sections, names='typ,sec')
-        for sec in self.sections['sec']:
-            sec.v = self._vrest
+        self._vrest = cfg['vrest']
 
 
         # Connect sections
-        for prev,next in zip(self.sections['sec'][:-1], self.sections['sec'][1:]):
-            next.connect(prev)
+        for a,b in zip(sections['sec'][:-1], sections['sec'][1:]):
+            b.connect(a)
+
 
 
         ### IHC Synapse
-        self._syn = h.Exp2Syn(self.sections['sec'][0](0.5))
+        self._syn = h.Exp2Syn(sections['sec'][0](0.5))
         self._syn.tau1 = 0.399806796048 / calc_tf(q10=2.4)
         self._syn.tau2 = 0.399889764048 / calc_tf(q10=2.4)
         assert self._syn.tau1 < self._syn.tau2
@@ -408,7 +414,7 @@ class ANF_Axon(ANF):
 
 
         ### Recording spikes from the last section
-        last = self.sections['sec'][-1]
+        last = sections['sec'][-1]
         self._probe = h.NetCon(last(0.5)._ref_v, None, 0, 0, 0, sec=last)
         self._spikes = h.Vector()
         self._probe.record(self._spikes)
@@ -418,11 +424,13 @@ class ANF_Axon(ANF):
         self._voltages = []
         if record_voltages:
             print "Recording voltages is on"
-            for sec in self.sections['sec']:
+            for sec in sections['sec']:
                 vec = h.Vector()
                 vec.record(sec(0.5)._ref_v)
                 self._voltages.append(vec)
 
+
+        self.sections = sections
 
 
 
