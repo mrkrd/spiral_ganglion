@@ -262,7 +262,7 @@ def make_config(name):
             'vrest_klt_rothman2003': -78,
             'vrest_ih_rothman2003': -78
         }
-        cfg['vrest'] = -78
+        cfg['vrest'] = -73
 
     elif name == 'rothman1993':
 
@@ -393,6 +393,8 @@ class ANF_Axon(ANF):
         sections['sec'][0].L = 10
 
 
+        for sec in sections['sec']:
+            sec.v = cfg['vrest']
         self._vrest = cfg['vrest']
 
 
@@ -409,7 +411,7 @@ class ANF_Axon(ANF):
         assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.6)
+        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5)
         self._con.delay = 0
 
 
