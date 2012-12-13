@@ -330,7 +330,7 @@ class ANF_Axon(ANF):
             nodes=20,
             record_voltages=False,
             channels='schwarz1987',
-            terminal_lenght=10
+            terminal_length=10
     ):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -390,7 +390,7 @@ class ANF_Axon(ANF):
 
 
         ### Terminal node
-        sections['sec'][0].L = terminal_lenght
+        sections['sec'][0].L = terminal_length
 
 
         for sec in sections['sec']:
