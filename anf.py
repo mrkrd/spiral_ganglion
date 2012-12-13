@@ -390,7 +390,7 @@ class ANF_Axon(ANF):
 
 
         ### Terminal node
-        sections['sec'][0].L = 10
+        sections['sec'][0].L = terminal_lenght
 
 
         for sec in sections['sec']:
