@@ -11,7 +11,7 @@ import logging
 import neuron
 from neuron import h
 
-from electrodes import Electrode
+from spiral_ganglion.electrodes import Electrode
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -263,6 +263,10 @@ def make_config(name):
             'vrest_ih_rothman2003': -78
         }
         cfg['vrest'] = -73
+
+        # print("ZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+        # cfg['internode_channels'] = cfg['node_channels']
+        # cfg['internode_vars'] = cfg['node_vars']
 
     elif name == 'rothman1993':
 

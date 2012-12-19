@@ -7,12 +7,16 @@ __author__ = "Marek Rudnicki"
 import numpy as np
 import multiprocessing
 import os
+import logging
 
-from anf import ANF_Axon
-from electrodes import Electrode
+from spiral_ganglion.anf import ANF_Axon
+from spiral_ganglion.electrodes import Electrode
 
 import neuron
 from neuron import h
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 def _simulate_anf_at( (z, electrodes, return_voltages) ):
@@ -139,8 +143,8 @@ def find_threshold(
         fs,
         pre_stimulus=None,
         pad=False,
-        error=1e-6,
-        debug=True):
+        error=1e-6):
+
 
     h.dt = 0.002                # [ms]
 
@@ -168,8 +172,7 @@ def find_threshold(
         if spikes.size > 0:
             break
 
-        if debug:
-            print (lo, hi)
+        logger.debug("{} {}".format(lo, hi))
 
         lo = hi
         hi = hi * 2
@@ -189,8 +192,7 @@ def find_threshold(
             pad=pad
         )
 
-        if debug:
-            print (lo, hi), spikes
+        logger.debug("{} {}".format(lo, hi))
 
         if spikes.size > 0:
             hi = amp
