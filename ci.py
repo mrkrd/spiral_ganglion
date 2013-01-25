@@ -15,8 +15,6 @@ from spiral_ganglion.electrodes import Electrode
 import neuron
 from neuron import h
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def _simulate_anf_at( (z, electrodes, return_voltages) ):
@@ -156,7 +154,7 @@ def find_threshold(
 
 
     lo = 0
-    hi = 1e-4
+    hi = 1e-12
 
     # find initial range: lo/hi
     while True:
@@ -172,7 +170,7 @@ def find_threshold(
         if spikes.size > 0:
             break
 
-        logger.debug("{} {}".format(lo, hi))
+        logging.debug(" {:>20}  {:<20}".format(lo, hi))
 
         lo = hi
         hi = hi * 2
@@ -192,7 +190,13 @@ def find_threshold(
             pad=pad
         )
 
-        logger.debug("{} {}".format(lo, hi))
+        # print(spikes)
+        # import spiral_ganglion as sg
+        # sg.anf._plot_voltages(anf.get_voltages()[:,-5:-1])
+        # import matplotlib.pyplot as plt
+        # plt.show()
+
+        logging.debug(" {:>20}  {:<20}".format(lo, hi))
 
         if spikes.size > 0:
             hi = amp

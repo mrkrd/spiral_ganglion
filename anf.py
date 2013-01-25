@@ -14,11 +14,19 @@ from neuron import h
 from spiral_ganglion.electrodes import Electrode
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 def calc_tf(q10, temp_ref=22):
     tf = q10 ** ((h.celsius - temp_ref)/10)
     return tf
+
+
+
+def _check_voltage_range(voltage):
+
+    v = np.array(voltage) * 1e-3 # [V]
+
+    assert np.all(-0.16 < v)
+    assert np.all(v < 0.1)
 
 
 
@@ -120,6 +128,8 @@ class ANF(object):
         Neuron must be initialized with `record_voltages=True'.
 
         """
+        _check_voltage_range(self._last_voltage)
+
         voltages = [np.asarray(vec) for vec in self._voltages]
         voltages = np.array(voltages).T
 
@@ -134,6 +144,7 @@ class ANF(object):
 
         """
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
+        _check_voltage_range(self._last_voltage)
 
         train = pd.DataFrame([{
             'spikes': 1e-3*np.array(self._spikes),
@@ -426,10 +437,18 @@ class ANF_Axon(ANF):
         self._probe.record(self._spikes)
 
 
+        ### Record voltages from the last section
+        last_voltage = h.Vector()
+        last_voltage.record(
+            sections['sec'][-1](0.5)._ref_v
+        )
+        self._last_voltage = last_voltage
+
+
         ### Recording voltages from all sections
         self._voltages = []
         if record_voltages:
-            print "Recording voltages is on"
+            logger.info("Recording voltages is on")
             for sec in sections['sec']:
                 vec = h.Vector()
                 vec.record(sec(0.5)._ref_v)
