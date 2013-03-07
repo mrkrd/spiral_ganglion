@@ -233,7 +233,7 @@ def make_config(name):
         'extracellular'
     ]
     cfg['internode_vars'] = {
-        'nseg': 1,
+        'nseg': 10,
         'L': 250,
         'Ra': 100,
         'diam': 1.5,
@@ -275,9 +275,7 @@ def make_config(name):
         }
         cfg['vrest'] = -73
 
-        # print("ZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-        # cfg['internode_channels'] = cfg['node_channels']
-        # cfg['internode_vars'] = cfg['node_vars']
+
 
     elif name == 'rothman1993':
 
@@ -449,10 +447,13 @@ class ANF_Axon(ANF):
         self._voltages = []
         if record_voltages:
             logger.info("Recording voltages is on")
+
+            h.topology()
             for sec in sections['sec']:
                 vec = h.Vector()
                 vec.record(sec(0.5)._ref_v)
                 self._voltages.append(vec)
+            exit()
 
 
         self.sections = sections
