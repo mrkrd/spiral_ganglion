@@ -29,11 +29,10 @@ import signals
 import ci
 
 
-def run(tmax):
-    neuron.run(tmax * 1e3)      # s -> ms
-
-
-def init(anfs):
+def run(
+        tmax,
+        anfs
+):
     for anf in anfs:
         anf.einit()
 
@@ -41,6 +40,9 @@ def init(anfs):
 
     for anf in anfs:
         anf.ainit()
+
+    neuron.run(tmax * 1e3)      # s -> ms
+
 
 
 def set_celsius(celsius):

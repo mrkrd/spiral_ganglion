@@ -233,7 +233,7 @@ def make_config(name):
         'extracellular'
     ]
     cfg['internode_vars'] = {
-        'nseg': 10,
+        'nseg': 1,
         'L': 250,
         'Ra': 100,
         'diam': 1.5,
@@ -448,12 +448,15 @@ class ANF_Axon(ANF):
         if record_voltages:
             logger.info("Recording voltages is on")
 
-            h.topology()
             for sec in sections['sec']:
-                vec = h.Vector()
-                vec.record(sec(0.5)._ref_v)
-                self._voltages.append(vec)
-            exit()
+                for seg in sec:
+                    vec = h.Vector()
+                    vec.record(seg._ref_v)
+                    self._voltages.append(vec)
+
+                # vec = h.Vector()
+                # vec.record(sec(0.5)._ref_v)
+                # self._voltages.append(vec)
 
 
         self.sections = sections
@@ -483,6 +486,7 @@ def _plot_voltages(voltages):
     )
 
     for v,a in zip(voltages.T, axes):
+        a.set_axis_off()
         a.plot(v)
 
 
