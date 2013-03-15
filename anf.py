@@ -404,6 +404,7 @@ class ANF_Axon(ANF):
 
         ### Terminal node
         sections['sec'][0].L = terminal_length
+        sections['sec'][0].nseg = 3
 
 
         for sec in sections['sec']:
