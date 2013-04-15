@@ -175,6 +175,7 @@ def find_threshold(
         lo = hi
         hi = hi * 2
 
+    logging.debug("Maximum value found: {hi}".format(hi=hi))
 
     # binary search for amp
     while (hi-lo) > error*(hi+lo)/2:
