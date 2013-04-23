@@ -487,7 +487,10 @@ def _plot_voltages(voltages):
     )
 
     for v,a in zip(voltages.T, axes):
-        a.set_axis_off()
+        # a.set_axis_off()
+        # a.patch.set_visible(False)
+        a.set_clip_on(False)
+        # a.axis('off')
         a.plot(v)
 
 

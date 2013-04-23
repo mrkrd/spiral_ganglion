@@ -144,7 +144,7 @@ def find_threshold(
         error=1e-6):
 
 
-    h.dt = 0.002                # [ms]
+    # h.dt = 0.002                # [ms]
 
     electrode.fs = fs
     anf.electrodes = [electrode]
