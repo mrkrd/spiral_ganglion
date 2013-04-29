@@ -112,6 +112,8 @@ def _run_single_electrode(
         pre_stimulus,
         pad):
 
+
+
     if pad:
         pre_pad = np.zeros(10e-3 * fs)
         post_pad = np.zeros(5e-3 * fs)
@@ -173,7 +175,8 @@ def find_threshold(
         logging.debug(" {:>20}  {:<20}".format(lo, hi))
 
         lo = hi
-        hi = hi * 2
+        hi = hi * 1.2
+
 
     logging.debug("Maximum value found: {hi}".format(hi=hi))
 
@@ -197,7 +200,7 @@ def find_threshold(
         # import matplotlib.pyplot as plt
         # plt.show()
 
-        logging.debug(" {:>20}  {:<20}".format(lo, hi))
+        logging.debug(" {:>20}  {:<20}, {}, {}".format(lo, hi, amp, spikes))
 
         if spikes.size > 0:
             hi = amp
