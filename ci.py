@@ -175,7 +175,7 @@ def find_threshold(
         logging.debug(" {:>20}  {:<20}".format(lo, hi))
 
         lo = hi
-        hi = hi * 1.2
+        hi = hi * 1.1
 
 
     logging.debug("Maximum value found: {hi}".format(hi=hi))
