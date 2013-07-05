@@ -452,8 +452,16 @@ class ANF_Axon(ANF):
             for sec in sections['sec']:
                 for seg in sec:
                     vec = h.Vector()
+
                     vec.record(seg._ref_v)
                     self._voltages.append(vec)
+
+                    # try:
+                    #     vec.record(seg.na_schwarz1987._ref_m)
+                    #     self._voltages.append(vec)
+                    # except Exception:
+                    #     pass
+
 
                 # vec = h.Vector()
                 # vec.record(sec(0.5)._ref_v)
