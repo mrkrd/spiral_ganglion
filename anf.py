@@ -179,7 +179,7 @@ class ANF(object):
         Note: must be called *before* neuron.init()
 
         """
-        assert h.dt <= dt_assert
+        assert h.dt <= dt_assert, "h.dt = {}, dt_assert = {}".format(h.dt, dt_assert)
 
         for sec in self.sections['sec']:
             sec.v = self._vrest
