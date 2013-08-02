@@ -19,6 +19,7 @@ import spiral_ganglion as sg
 # expected: fs=500e3, anf_num=10e3, tmax=0.5
 # expected time: 100*5*time ~ 196000s ~ 55h
 
+# 1000 neurons => 0.5h (tmax=0.5)
 
 # possible optimizations:
 # - lower fs
