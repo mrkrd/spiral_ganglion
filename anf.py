@@ -501,6 +501,7 @@ def _plot_voltages(voltages):
         # a.axis('off')
         a.plot(v)
 
+    return fig,axes
 
 
 def plot_geometry(objects):
