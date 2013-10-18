@@ -32,10 +32,18 @@ def _check_voltage_range(voltage):
 
 class ANF(object):
 
+    def get_sections(self, name=None):
+        selected = []
+        for typ,sec in zip(self.section_names, self.sections):
+            if (name is None) or (typ == name):
+                selected.append(sec)
+        return selected
+
+
 
     def _get_segments(self):
         """ Returns list of all segments along the neuron """
-        sections = self.sections['sec']
+        sections = self.sections
         segments = []
         for sec in sections:
             idx = [seg.x for seg in sec]
@@ -43,14 +51,17 @@ class ANF(object):
         return segments
 
 
-    def _get_segment_positions_along_neuron(self):
+
+    def _get_segment_path_positions(self):
         """Returns a list of positions of all segments along the
         neuron in [m]
+
+        TODO: implement using h.Section().distance()
 
         """
         positions = []
         start = 0               # beginning of the currenct section
-        for sec in self.sections['sec']:
+        for sec in self.sections:
             seg_x = np.array([seg.x for seg in sec])   # [1]
             positions.extend(start + seg_x*1e-6*sec.L) # um -> m
             start = start + 1e-6*sec.L                 # um -> m
@@ -76,17 +87,26 @@ class ANF(object):
         z: position along cochlea
 
         """
-        Ls = self._get_segment_positions_along_neuron()
+        self._geometry = geometry
+        self._geometry_pars = kwargs
 
-        if geometry == 'straight':
-            self.x = kwargs['x0'] + Ls
-            self.y = kwargs['y0'] * np.ones(len(Ls))
-            self.z = kwargs['z0'] * np.ones(len(Ls))
 
-        elif geometry == 'bent':
-            a = kwargs['a']
-            b = kwargs['b']
-            z = kwargs['z']
+
+    def get_positions(self):
+        ppos = self._get_segment_path_positions()
+
+        if self._geometry is None:
+            raise RuntimeError("Neuron's geometry not set. Call anf.set_geometry()")
+
+        elif self._geometry == 'straight':
+            x = self._geometry_pars['x0'] + ppos
+            y = self._geometry_pars['y0'] * np.ones(len(ppos))
+            z = self._geometry_pars['z0'] * np.ones(len(ppos))
+
+        elif self._geometry == 'bent':
+            a = self._geometry_pars['a']
+            b = self._geometry_pars['b']
+            z_par = self._geometry_pars['z']
             r = b
             shift = np.abs(a-b)
 
@@ -96,27 +116,31 @@ class ANF(object):
 
 
             # Initial straight segment
-            sel = Ls[ (Ls<shift) ]
+            sel = ppos[ (ppos<shift) ]
             x = sel
             y = b * np.ones(len(sel))
 
             # Quarter circle segment
-            sel = Ls[ (Ls>=shift) & (Ls<(quarter+shift)) ] - shift
+            sel = ppos[ (ppos>=shift) & (ppos<(quarter+shift)) ] - shift
             x = np.append(x, shift + r*np.sin(2 * np.pi * sel / circumference))
             y = np.append(y, r*np.cos(2 * np.pi * sel / circumference))
 
             # Remaining straight segment
-            sel = Ls[ (Ls>=(quarter+shift)) ] - shift - quarter
+            sel = ppos[ (ppos>=(quarter+shift)) ] - shift - quarter
+
             x = np.append(x, a*np.ones(len(sel)))
             y = np.append(y, -sel)
-
-            self.x = x
-            self.y = y
-            self.z = kwargs['z'] * np.ones(len(Ls))
+            z = z_par * np.ones(len(ppos))
 
             # import matplotlib.pyplot as plt
             # plt.plot(x,y, 'o')
             # plt.show()
+
+        positions = np.rec.fromarrays(
+            [x,y,z],
+            names='x,y,z'
+        )
+        return positions
 
 
     def get_voltages(self):
@@ -125,7 +149,7 @@ class ANF(object):
         of the model.  Potentials are recorded in the from the middle
         of each section: sec(0.5).
 
-        Neuron must be initialized with `record_voltages=True'.
+        The neuron must be initialized with `record_voltages=True'.
 
         """
         _check_voltage_range(self._last_voltage)
@@ -164,11 +188,11 @@ class ANF(object):
         """
         assert h.dt <= 0.01
 
-        for sec in self.sections['sec']:
+        for sec in self.sections:
             sec.v = self._vrest
 
         for v in self.vesicles:
-            self._con.event(float(v))
+            self._con.event(float(v*1e3))
 
 
 
@@ -181,19 +205,11 @@ class ANF(object):
         """
         assert h.dt <= dt_assert, "h.dt = {}, dt_assert = {}".format(h.dt, dt_assert)
 
-        for sec in self.sections['sec']:
+        for sec in self.sections:
             sec.v = self._vrest
 
         self._stim_vectors = []
         if self.electrodes:
-            # Make sure that each segment has defined position
-            assert (
-                len(self.x) ==
-                len(self.y) ==
-                len(self.z) ==
-                len(self._get_segment_positions_along_neuron())
-            )
-
             # Make sure all electrodes have signals of the same fs
             fss = np.array([el.fs for el in self.electrodes])
             fs = fss[0]
@@ -358,9 +374,8 @@ class ANF_Axon(ANF):
 
 
         self.vesicles = [] # vesicle timings for acoustical stimulation
-        self.x = None      # array of segment's x coordinate locations
-        self.y = None      # array of segment's y coordinate locations
-        self.z = None      # array of segment's z coordinate locations
+
+        self._geometry = None
 
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
@@ -374,6 +389,7 @@ class ANF_Axon(ANF):
 
 
         sections = []
+        names = []
         for i in range(nodes):
             ### Node sections
             sec = h.Section()
@@ -383,7 +399,8 @@ class ANF_Axon(ANF):
             for var,val in cfg['node_vars'].items():
                 setattr(sec, var, val)
 
-            sections.append(('node', sec))
+            sections.append(sec)
+            names.append('node')
 
 
             ### Internode sections
@@ -394,33 +411,33 @@ class ANF_Axon(ANF):
             for var,val in cfg['internode_vars'].items():
                 setattr(sec, var, val)
 
-            sections.append(('internode', sec))
+            sections.append(sec)
+            names.append('internode')
 
 
-        sections = np.rec.fromrecords(sections, names=['type', 'sec'])
 
         for var,val in cfg['global_vars'].items():
             setattr(h, var, val)
 
 
         ### Terminal node
-        sections['sec'][0].L = terminal_length
-        sections['sec'][0].nseg = terminal_nseg
+        sections[0].L = terminal_length
+        sections[0].nseg = terminal_nseg
 
 
-        for sec in sections['sec']:
+        for sec in sections:
             sec.v = cfg['vrest']
         self._vrest = cfg['vrest']
 
 
         # Connect sections
-        for a,b in zip(sections['sec'][:-1], sections['sec'][1:]):
+        for a,b in zip(sections[:-1], sections[1:]):
             b.connect(a)
 
 
 
         ### IHC Synapse
-        self._syn = h.Exp2Syn(sections['sec'][0](0.5))
+        self._syn = h.Exp2Syn(sections[0](0.5))
         self._syn.tau1 = 0.399806796048 / calc_tf(q10=2.4)
         self._syn.tau2 = 0.399889764048 / calc_tf(q10=2.4)
         assert self._syn.tau1 < self._syn.tau2
@@ -431,7 +448,7 @@ class ANF_Axon(ANF):
 
 
         ### Recording spikes from the last section
-        last = sections['sec'][-1]
+        last = sections[-1]
         self._probe = h.NetCon(last(0.5)._ref_v, None, 0, 0, 0, sec=last)
         self._spikes = h.Vector()
         self._probe.record(self._spikes)
@@ -440,7 +457,7 @@ class ANF_Axon(ANF):
         ### Record voltages from the last section
         last_voltage = h.Vector()
         last_voltage.record(
-            sections['sec'][-1](0.5)._ref_v
+            sections[-1](0.5)._ref_v
         )
         self._last_voltage = last_voltage
 
@@ -450,7 +467,7 @@ class ANF_Axon(ANF):
         if record_voltages:
             logger.info("Recording voltages is on")
 
-            for sec in sections['sec']:
+            for sec in sections:
                 for seg in sec:
                     vec = h.Vector()
 
@@ -469,7 +486,10 @@ class ANF_Axon(ANF):
                 # self._voltages.append(vec)
 
 
+
+        assert len(sections) == len(names)
         self.sections = sections
+        self.section_names = names
 
 
 
@@ -518,10 +538,11 @@ def plot_geometry(objects):
             z = obj.z
 
         elif isinstance (obj, ANF):
+            pos = obj.get_positions()
             fmt = 'ko'
-            x = obj.x
-            y = obj.y
-            z = obj.z
+            x = pos['x']
+            y = pos['y']
+            z = pos['z']
 
 
         _plot_object(x,y,z,fmt, fig)
@@ -564,7 +585,7 @@ if __name__ == "__main__":
     anf = ANF_Axon(record_voltages=True)
 
     h.topology()
-    h.psection(sec=anf.sections['sec'][0])
+    h.psection(sec=anf.get_sections()[0])
 
     anf.vesicles = [2, 5]
 
@@ -612,13 +633,13 @@ if __name__ == "__main__":
     ### Conductances
     capacity = 0.0714e-12
 
-    print
-    print "g_Na ", anf.sections['sec'][0].gnabar_na_schwarz1987
-    print "g_Kv ", anf.sections['sec'][0].gkbar_k_schwarz1987
-    print "g_Klt", anf.sections['sec'][0].gkltbar_klt_rothman2003
-    print "g_h  ", anf.sections['sec'][0].ghbar_ih_rothman2003
-    print "g_pas", anf.sections['sec'][0].g_pas
-    print
+    # print
+    # print "g_Na ", anf.sections['sec'][0].gnabar_na_schwarz1987
+    # print "g_Kv ", anf.sections['sec'][0].gkbar_k_schwarz1987
+    # print "g_Klt", anf.sections['sec'][0].gkltbar_klt_rothman2003
+    # print "g_h  ", anf.sections['sec'][0].ghbar_ih_rothman2003
+    # print "g_pas", anf.sections['sec'][0].g_pas
+    # print
 
 
 

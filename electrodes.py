@@ -35,11 +35,13 @@ class Electrode(object):
         assert self.stim is not None, "Stimulus must be set."
         assert self.fs is not None, "Sampling frequency must be set."
 
+        anf_pos = anf.get_positions()
+
 
         ### Calculate decay along cochlea
         gain_dB = -1e3          # [dB/m]: -1dB/mm
-        z_anf = anf.z[0]
-        assert np.all(anf.z == z_anf)
+        z_anf = anf_pos.z[0]
+        assert np.all(anf_pos.z == z_anf)
 
         exponent = gain_dB * np.abs(self.z - z_anf) / 20
         z_decay_factor = 10**exponent
@@ -49,7 +51,7 @@ class Electrode(object):
 
         ### Calculate homogenious medium (1/r)
         # resistivity = 300 ohm*cm = 3 ohm*m
-        r = np.sqrt((self.x - anf.x)**2 + (self.y - anf.y)**2)
+        r = np.sqrt((self.x - anf_pos.x)**2 + (self.y - anf_pos.y)**2)
         node_factors = 3 / (4 * np.pi * r)
 
         # import matplotlib.pyplot as plt
