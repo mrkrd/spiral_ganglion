@@ -13,7 +13,8 @@ neuron.load_mechanisms(lib_dir)
 
 from anf import (
     ANF_Axon,
-    plot_geometry
+    plot_geometry,
+    plot_vectors
 )
 
 from electrodes import Electrode
@@ -51,3 +52,8 @@ def set_celsius(celsius):
 
 def set_fs(fs):
     h.dt = 1e3/fs
+
+
+def show():
+    import matplotlib.pyplot as plt
+    plt.show()

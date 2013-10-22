@@ -504,6 +504,7 @@ def calc_conductivity_cm2(conductance, capacity):
 
 
 
+
 def plot_vectors(vectors):
 
     import matplotlib.pyplot as plt
@@ -517,6 +518,7 @@ def plot_vectors(vectors):
 
     for v,a in zip(vectors.T, axes):
         lines = a.plot(v)
+        a.patch.set_visible(False)
 
         for line in lines:
             line.set_clip_on(False)
