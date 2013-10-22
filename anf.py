@@ -504,25 +504,26 @@ def calc_conductivity_cm2(conductance, capacity):
 
 
 
-def _plot_voltages(voltages):
+def plot_vectors(vectors):
 
     import matplotlib.pyplot as plt
 
     fig,axes = plt.subplots(
-        voltages.shape[1],
+        vectors.shape[1],
         1,
         sharex=True,
         sharey=True
     )
 
-    for v,a in zip(voltages.T, axes):
-        # a.set_axis_off()
-        # a.patch.set_visible(False)
-        a.set_clip_on(False)
-        # a.axis('off')
-        a.plot(v)
+    for v,a in zip(vectors.T, axes):
+        lines = a.plot(v)
+
+        for line in lines:
+            line.set_clip_on(False)
 
     return fig,axes
+
+
 
 
 def plot_geometry(objects):
