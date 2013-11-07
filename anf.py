@@ -505,23 +505,33 @@ def calc_conductivity_cm2(conductance, capacity):
 
 
 
-def plot_vectors(vectors):
+def plot_vectors(vectors, axes=None):
 
     import matplotlib.pyplot as plt
 
-    fig,axes = plt.subplots(
-        vectors.shape[1],
-        1,
-        sharex=True,
-        sharey=True
-    )
+    if axes is None:
+        fig,axes = plt.subplots(
+            vectors.shape[1],
+            1,
+            sharex=True,
+            sharey=True
+        )
+    else:
+        assert len(axes) == vectors.shape[1]
+        fig = plt.gcf()
+
 
     for v,a in zip(vectors.T, axes):
         lines = a.plot(v)
         a.patch.set_visible(False)
+        a.set_frame_on(False)
+        # a.get_major_ticks().set_visible(False)
 
         for line in lines:
             line.set_clip_on(False)
+
+    a.set_frame_on(True)
+    # a.axes.get_xaxis().set_visible(True)
 
     return fig,axes
 
