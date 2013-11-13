@@ -87,3 +87,25 @@ def find_action_potentials(voltages, fs):
     # plt.imshow(positive, aspect='auto', interpolation='nearest')
     # plt.show()
     # print(voltages)
+
+
+
+def electrical_pulse_parameters(
+        shape,
+        **kwargs
+):
+
+    if shape == 'monophasic':
+
+        polarity = kwargs['polarity']
+        duration = kwargs['duration']
+
+        amplitude = polarity / durations
+
+
+
+
+
+
+    else:
+        raise RuntimeError("Unknown pulse shape")
