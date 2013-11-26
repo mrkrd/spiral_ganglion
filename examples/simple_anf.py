@@ -9,7 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import spiral_ganglion as sg
-from spiral_ganglion.anf import _plot_voltages
 
 import neuron
 from neuron import h
@@ -75,11 +74,11 @@ def main():
     # plot
     print(anf_ac.get_spikes(), anf_el.get_spikes())
 
-    _plot_voltages(
+    sg.plot_vectors(
         anf_ac.get_voltages()[:,0:6]
     )
 
-    _plot_voltages(
+    sg.plot_vectors(
         anf_el.get_voltages()[:,0:6]
     )
 
