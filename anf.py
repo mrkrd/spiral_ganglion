@@ -513,8 +513,8 @@ def plot_vectors(vectors, axes=None):
         fig,axes = plt.subplots(
             vectors.shape[1],
             1,
-            # sharex=True,
-            # sharey=True
+            sharex=True,
+            sharey=True
         )
     else:
         assert len(axes) == vectors.shape[1]
