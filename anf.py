@@ -258,7 +258,7 @@ def make_config(name):
         'e_pas': e_pas
     }
 
-    if name == 'schwarz1987':
+    if name == 'schwarz1987_klt':
 
         cfg['node_channels'] = [
             'na_schwarz1987',
@@ -293,7 +293,36 @@ def make_config(name):
 
 
 
-    elif name == 'rothman1993':
+    elif name == 'schwarz1987_pure':
+
+        cfg['node_channels'] = [
+            'na_schwarz1987',
+            'k_schwarz1987',
+            'pas',
+            'extracellular'
+        ]
+        cfg['node_vars'] = {
+            'nseg': 1,
+            'L': 1,
+            'Ra': 100,
+            'diam': 1.5,
+            'cm': 0.9,
+            'gnabar_na_schwarz1987': g_na,
+            'gkbar_k_schwarz1987': g_kv,
+            'g_pas': g_pas,
+            'ena': ena,
+            'ek': ek,
+            'e_pas': e_pas
+        }
+        cfg['global_vars'] = {
+            'vrest_na_schwarz1987': -78,
+            'vrest_k_schwarz1987': -78,
+        }
+        cfg['vrest'] = -73
+
+
+
+    elif name == 'rothman1993_klt':
 
         cfg['node_channels'] = [
             'na_rothman1993',
