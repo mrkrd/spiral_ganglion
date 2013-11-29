@@ -259,7 +259,6 @@ def make_config(name):
     }
 
     if name == 'schwarz1987_klt':
-
         cfg['node_channels'] = [
             'na_schwarz1987',
             'k_schwarz1987',
@@ -294,7 +293,6 @@ def make_config(name):
 
 
     elif name == 'schwarz1987_pure':
-
         cfg['node_channels'] = [
             'na_schwarz1987',
             'k_schwarz1987',
@@ -318,12 +316,31 @@ def make_config(name):
             'vrest_na_schwarz1987': -78,
             'vrest_k_schwarz1987': -78,
         }
-        cfg['vrest'] = -73
+        cfg['vrest'] = -78
+
+
+
+    elif name == 'passive_only':
+        cfg['node_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['node_vars'] = {
+            'nseg': 1,
+            'L': 1,
+            'Ra': 100,
+            'diam': 1.5,
+            'cm': 0.9,
+            'g_pas': g_pas,
+            'e_pas': e_pas
+        }
+        cfg['global_vars'] = {
+        }
+        cfg['vrest'] = -78
 
 
 
     elif name == 'rothman1993_klt':
-
         cfg['node_channels'] = [
             'na_rothman1993',
             'kht_rothman2003',
@@ -452,7 +469,6 @@ class ANF_Axon(ANF):
         ### Terminal node
         sections[0].L = terminal_length
         sections[0].nseg = terminal_nseg
-
 
         for sec in sections:
             sec.v = cfg['vrest']
