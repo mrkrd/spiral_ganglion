@@ -470,6 +470,7 @@ class ANF_Axon(ANF):
         sections[0].L = terminal_length
         sections[0].nseg = terminal_nseg
 
+
         for sec in sections:
             sec.v = cfg['vrest']
         self._vrest = cfg['vrest']
@@ -478,7 +479,6 @@ class ANF_Axon(ANF):
         # Connect sections
         for a,b in zip(sections[:-1], sections[1:]):
             b.connect(a)
-
 
 
         ### IHC Synapse
