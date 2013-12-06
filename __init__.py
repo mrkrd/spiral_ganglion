@@ -17,7 +17,8 @@ neuron.load_mechanisms(lib_dir)
 from anf import (
     ANF_Axon,
     plot_geometry,
-    plot_vectors
+    plot_vectors,
+    generate_anf_config
 )
 
 from electrodes import Electrode

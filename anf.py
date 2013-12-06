@@ -230,7 +230,10 @@ class ANF(object):
 
 
 
-def make_config(name):
+def generate_anf_config(
+        name,
+        diam=1.5
+):
     capacity = 0.0714e-12
 
     g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
@@ -252,7 +255,7 @@ def make_config(name):
         'nseg': 1,
         'L': 250,
         'Ra': 100,
-        'diam': 1.5,
+        'diam': diam,
         'cm': 1e-3,
         'g_pas': g_pas,
         'e_pas': e_pas
@@ -271,7 +274,7 @@ def make_config(name):
             'nseg': 1,
             'L': 1,
             'Ra': 100,
-            'diam': 1.5,
+            'diam': diam,
             'cm': 0.9,
             'gnabar_na_schwarz1987': g_na,
             'gkbar_k_schwarz1987': g_kv,
@@ -303,7 +306,7 @@ def make_config(name):
             'nseg': 1,
             'L': 1,
             'Ra': 100,
-            'diam': 1.5,
+            'diam': diam,
             'cm': 0.9,
             'gnabar_na_schwarz1987': g_na,
             'gkbar_k_schwarz1987': g_kv,
@@ -329,7 +332,7 @@ def make_config(name):
             'nseg': 1,
             'L': 1,
             'Ra': 100,
-            'diam': 1.5,
+            'diam': diam,
             'cm': 0.9,
             'g_pas': g_pas,
             'e_pas': e_pas
@@ -352,7 +355,7 @@ def make_config(name):
             'nseg': 1,
             'L': 1,
             'Ra': 100,
-            'diam': 1.5,
+            'diam': diam,
             'cm': 0.9,
             'gnabar_na_rothman1993': g_na,
             'gkhtbar_kht_rothman2003': g_kv,
@@ -427,7 +430,7 @@ class ANF_Axon(ANF):
                                 # (class Electrode)
 
         if isinstance(channels, str):
-            cfg = make_config(channels)
+            cfg = generate_anf_config(channels)
 
         else:
             cfg = channels
