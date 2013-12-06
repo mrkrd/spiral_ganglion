@@ -409,7 +409,8 @@ class ANF_Axon(ANF):
             record_voltages=False,
             channels='schwarz1987',
             terminal_length=10,
-            terminal_nseg=1
+            terminal_nseg=1,
+            diam=1.5,
     ):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -430,7 +431,10 @@ class ANF_Axon(ANF):
                                 # (class Electrode)
 
         if isinstance(channels, str):
-            cfg = generate_anf_config(channels)
+            cfg = generate_anf_config(
+                channels,
+                diam=diam
+            )
 
         else:
             cfg = channels

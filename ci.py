@@ -154,7 +154,6 @@ def find_threshold(
     if pre_stimulus is None:
         pre_stimulus = np.array([])
 
-
     lo = 0
     hi = 1e-12
 
