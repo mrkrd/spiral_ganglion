@@ -440,7 +440,6 @@ class ANF_Axon(ANF):
             cfg = channels
 
 
-
         sections = []
         names = []
         for i in range(nodes):
