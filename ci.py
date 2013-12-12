@@ -168,7 +168,7 @@ def find_threshold(
             pre_stimulus=pre_stimulus,
             pad=pad
         )
-        if spikes.size > 0:
+        if len(spikes) > 0:
             break
 
         logging.debug(" {:>20}  {:<20}".format(lo, hi))
