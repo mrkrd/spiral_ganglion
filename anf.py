@@ -407,7 +407,7 @@ class ANF_Axon(ANF):
             self,
             nodes=20,
             record_voltages=False,
-            channels='schwarz1987',
+            channels='schwarz1987_pure',
             terminal_length=10,
             terminal_nseg=1,
             diam=1.5,
