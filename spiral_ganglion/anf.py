@@ -162,8 +162,8 @@ class ANF(object):
         return voltages
 
 
-    def get_spikes(self):
-        """Return an array of spike timings recorded from the last
+    def get_trains(self):
+        """Return an array of spike trains recorded from the last
         section.
 
         """
@@ -178,6 +178,7 @@ class ANF(object):
 
         return train
 
+    get_spikes = get_trains
 
     def ainit(self):
         """

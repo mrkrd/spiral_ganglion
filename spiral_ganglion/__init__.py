@@ -18,15 +18,18 @@ from anf import (
     ANF_Axon,
     plot_geometry,
     plot_vectors,
-    generate_anf_config
+    generate_anf_config,
 )
 
-from electrodes import Electrode
+from electrodes import (
+    Electrode,
+    calculate_medel_electrode_z_position,
+)
 
 from ci import (
     run_ci_simulation,
     make_anf_electrode,
-    find_threshold
+    find_threshold,
 )
 
 

@@ -3,3 +3,4 @@ x86_64
 *.pyc
 tutorial/out.mat
 tmp
+*.egg-info

@@ -7,24 +7,22 @@ __author__ = "Marek Rudnicki"
 import numpy as np
 
 class Electrode(object):
-    """
-    Represents electrode located at (self.x, self.y, self.z) coordinates.
+    """Point electrode located at (x, y, z) coordinates.
+
+    Attributes
+    ----------
+
+    x, y, z : float
+        Electrode position in [m].
 
     """
-    def __init__(self, el_num=None):
-        """
-        el_num: electrode number (1-12)
-        """
+    def __init__(self):
         self.x = 300e-6         # [m]
         self.y = 0              # [m]
+        self.z = 0              # [m]
 
         self.stim = None        # [A]
         self.fs = None          # [Hz]
-
-        if el_num is not None:
-            self.z = np.linspace(4.6e-3, 31e-3, 12)[el_num-1]
-        else:
-            self.z = 0          # [m]
 
 
     def calculate_potentials(self, anf):
@@ -63,8 +61,15 @@ class Electrode(object):
         return potentials
 
 
+def calculate_medel_electrode_z_position(electrode_number):
+    z = np.linspace(4.6e-3, 31e-3, 12)[electrode_number-1]
+
+    return z
+
+
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()
