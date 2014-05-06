@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""Run a simple CI simulation with 10 spiral ganglion neurons and two
+stimulating electrodes.
+
+"""
+
 from __future__ import division, absolute_import, print_function
 
 __author__ = "Marek Rudnicki"
