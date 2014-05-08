@@ -234,12 +234,13 @@ def _run_single_electrode(
         (pre_pad, pre_stimulus, stimulus*amplitude, post_pad)
     )
 
-    anf.einit()
-    neuron.init()
-    tmax = 1000 * len(electrode.stim) / electrode.fs
-    neuron.run(tmax)
+    sg.run(
+        tmax=(len(electrode.stim) / electrode.fs),
+        anfs=[anf]
+    )
 
-    spikes = anf.get_spikes()['spikes'][0]
+    anf_trains = anf.get_trains()
+    spikes = anf_trains['spikes'][0]
 
     return spikes
 
