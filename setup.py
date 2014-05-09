@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "spiral_ganglion",
-    version = "0.1",
+    version = "0.2",
     packages = find_packages(),
     package_data = {
         "spiral_ganglion": ["*.mod"]
@@ -12,6 +12,6 @@ setup(
 
     author = "Marek Rudnicki",
     author_email = "marek.rudnicki@tum.de",
-    description = "Spiral Ganglion model in Python.",
+    description = "Spiral ganglion model.",
     license = "GPL",
 )
