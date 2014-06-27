@@ -13,7 +13,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-import mrlib.thorns as th
+import thorns as th
 import spiral_ganglion as sg
 
 

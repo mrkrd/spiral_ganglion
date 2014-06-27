@@ -1,32 +1,34 @@
-Spiral ganglion neuron model for synaptic and electrical stimulation.
+spiral_ganglion
+===============
+
+*Spiral ganglion neuron model for synaptic and electrical stimulation*
+
+:Name: spiral_ganglion
+:Author: Marek Rudnicki
+:Email: marek.rudnicki@tum.de
+:License: GNU General Public License v3 or later (GPLv3+)
 
 
 Dependencies
-============
+------------
 
-numpy
-neuron
+- numpy_
+- neuron_
+- thorns_ (only to run example scripts)
 
-mrlib
-
-
+.. _numpy: http://www.numpy.org/
+.. _neuron: http://www.neuron.yale.edu/neuron/
+.. _thorns: https://github.com/mrkrd/thorns
 
 
 Installation
-============
+------------
 
-Developer install
------------------
+::
 
-# Clone the repository
-git clone ssh://repos/path/spiral_ganglion.git
+   # Install in the developer mode
+   python setup.py develop --user
 
-cd spiral_ganglion
-
-# Install the package in developer mode
-python setup.py develop --user
-
-cd spiral_ganglion
-
-# Compile nmodl channels
-nrnivmodl
+   # Compile mod files (channels)
+   cd spiral_ganglion
+   nrnivmodl
