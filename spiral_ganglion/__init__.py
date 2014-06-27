@@ -5,6 +5,8 @@ from __future__ import print_function
 
 __author__ = "Marek Rudnicki"
 
+__version__ = "0.3"
+
 import numpy as np
 
 import neuron

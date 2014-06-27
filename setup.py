@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name = "spiral_ganglion",
-    version = "0.2",
+    version = "0.3",
     author = "Marek Rudnicki",
     author_email = "marek.rudnicki@tum.de",
 
