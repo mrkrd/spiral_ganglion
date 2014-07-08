@@ -146,7 +146,33 @@ def find_threshold(
         pad=False,
         error=1e-6
 ):
-    """TODO: docstring"""
+    """Find firing threshold of an spiral ganglion neuron stimulated by an
+    electrode.
+
+    Parameters
+    ----------
+    anf : ANF_Axon
+        Spiral ganglion neuron.
+    electrode : Electrode
+        Stimulating electrode.
+    stimulus : array_like
+        Electrical stimulus.
+    fs : float
+        Sampling frequency of the stimulus.
+    pre_stimulus : array_like, optional
+        Conditioning stimulus.  The amplitude of `pre_stimulus` is
+        constant during simulations.
+    pad : bool, optional
+        If True, then add extra padding to the stimulus.
+    error : float, optional
+        Error of the threshold search at which break the search loop.
+
+    Returns
+    -------
+    float
+        Firing threshold.
+
+    """
 
     # h.dt = 0.002                # [ms]
 
@@ -240,7 +266,7 @@ def _run_single_electrode(
     )
 
     anf_trains = anf.get_trains()
-    spikes = anf_trains['spikes'][0]
+    spikes, = anf_trains['spikes']
 
     return spikes
 
