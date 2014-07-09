@@ -557,7 +557,7 @@ def calc_conductivity_cm2(conductance, capacity):
 
 
 
-def plot_vectors(vectors, axes=None):
+def plot_vectors(vectors, axes=None, fs=None):
 
     import matplotlib.pyplot as plt
 
@@ -585,15 +585,21 @@ def plot_vectors(vectors, axes=None):
     a.set_frame_on(True)
     # a.axes.get_xaxis().set_visible(True)
 
-    return fig,axes
+    # return fig,axes
 
 
 
 
 def plot_geometry(objects):
+    """Plot `objects` (e.g. `ANF_Axon`, `Electrode`) onto XYZ planes.
+
+    """
     import matplotlib.pyplot as plt
 
     fig = plt.figure()
+    xy = fig.add_subplot(221)
+    zy = fig.add_subplot(222, sharey=xy)
+    xz = fig.add_subplot(223, sharex=xy)
 
     for obj in objects:
         if isinstance(obj, Electrode):
@@ -610,13 +616,15 @@ def plot_geometry(objects):
             z = pos['z']
 
 
-        _plot_object(x,y,z,fmt, fig)
+        _plot_object(x,y,z, fmt, fig)
+
+    # return fig
 
 
+def _plot_object(x,y,z, fmt, fig):
 
-def _plot_object(x,y,z,fmt, fig):
+    xy, zy, xz = fig.axes
 
-    xy = fig.add_subplot(221)
     xy.plot(x,y,fmt)
     xy.set_title("XY")
     xy.set_xlabel("X [m]")
@@ -624,8 +632,6 @@ def _plot_object(x,y,z,fmt, fig):
     xy.set_aspect('equal', 'datalim')
 
 
-
-    zy = fig.add_subplot(222, sharey=xy)
     zy.plot(z,y,fmt)
     zy.set_title("ZY")
     zy.set_xlabel("Z [m]")
@@ -633,7 +639,6 @@ def _plot_object(x,y,z,fmt, fig):
     zy.set_aspect('equal', 'datalim')
 
 
-    xz = fig.add_subplot(223, sharex=xy)
     xz.plot(x,z,fmt)
     xz.set_title("XZ")
     xz.set_xlabel("X [m]")
