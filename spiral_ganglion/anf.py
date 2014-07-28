@@ -72,13 +72,15 @@ class ANF(object):
 
 
     def set_geometry(self, geometry, **kwargs):
-        """
-        Sets position of each segment of the neuron.
+        """Sets position of each segment of the neuron.
 
-        Note: units in use micrometers
+        Parameters
+        ----------
+        geometry : {'straight', 'bent'}
+            Type of the geometry to use.
 
-        'straight'
-        x0, y0, z0: coordinates of the initial segment
+        'straight' (straight neuron along the x-axis)
+        x0, y0, z0: coordinates of the initial segment (m)
         x0, y0: are in the plane of cross section of scala tympani
         z0: coordinate along cochlea
 
@@ -93,6 +95,7 @@ class ANF(object):
 
 
     def get_positions(self):
+        """Return position of all segments of the neuron."""
         ppos = self._get_segment_path_positions()
 
         if self._geometry is None:
