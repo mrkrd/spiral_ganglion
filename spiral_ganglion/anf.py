@@ -415,13 +415,16 @@ class ANF_Axon(ANF):
             terminal_length=10,
             terminal_nseg=1,
             diam=1.5,
+            weight=None,
     ):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
 
-        record_voltages: when True membrane potentials are recorded
-                         internally and can be returned with
-                         get_voltages()
+        record_voltages : bool
+            When True membrane potentials are recorded internally and
+            can be returned with `get_voltages`.
+        weight : float, optional
+            Synaptic weight.
 
         """
         logger.info("ANF temperature: {} C".format(h.celsius))
@@ -493,13 +496,16 @@ class ANF_Axon(ANF):
 
         ### IHC Synapse
         self._syn = h.Exp2Syn(sections[0](0.5))
-        self._syn.tau1 = 0.399806796048 / calc_tf(q10=2.4)
-        self._syn.tau2 = 0.399889764048 / calc_tf(q10=2.4)
+        self._syn.tau1 = 0.000392876886274 * 1e3 / calc_tf(q10=2.4)
+        self._syn.tau2 = 0.000392990435175 * 1e3 / calc_tf(q10=2.4)
         assert self._syn.tau1 < self._syn.tau2
         self._syn.e = 0
         self._con = h.NetCon(None, self._syn)
-        self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5)
         self._con.delay = 0
+        if weight is None:
+            self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5) # * 1e6
+        else:
+            self._con.weight[0] = 1e6 * weight
 
 
         ### Recording spikes from the last section
