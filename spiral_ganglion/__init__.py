@@ -39,19 +39,31 @@ import signals
 import ci
 
 
-def run(
-        tmax,
-        anfs
-):
+def run(duration, anfs):
+    """Run a simulation of spiral ganglion neurons.
+
+    This function takes care of proper acoustic and electric
+    initialization.
+
+    Parameters
+    ----------
+    duration : float
+        Duration of the simulation in seconds.
+    anfs : list of sg.ANF objects
+        List of sg.ANF objects for initialization.
+
+    """
     for anf in anfs:
-        anf.einit()
+        if anf.electrodes:
+            anf.einit()
 
     neuron.init()
 
     for anf in anfs:
-        anf.ainit()
+        if len(anf.vesicles) > 0:
+            anf.ainit()
 
-    neuron.run(tmax * 1e3)      # s -> ms
+    neuron.run(duration * 1e3)      # s -> ms
 
 
 
