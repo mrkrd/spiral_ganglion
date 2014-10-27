@@ -173,15 +173,25 @@ class ANF(object):
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
         _check_voltage_range(self._last_voltage)
 
-        train = pd.DataFrame([{
+        row = {
             'spikes': 1e-3*np.array(self._spikes),
             'duration': 1e-3*h.t,
             'type': 'anf'
-        }])
+        }
+
+        row.update(self._meta)
+
+        train = pd.DataFrame([row])
 
         return train
 
-    get_spikes = get_trains
+
+    def get_spikes(self):
+        """Get raw spike times.  See also `get_trains` for spike_trains output."""
+        assert h.t != 0, "Time is 0 (did you run the simulation already?)"
+        spikes = 1e-3*np.array(self._spikes)
+        return spikes
+
 
     def ainit(self):
         """
@@ -416,6 +426,7 @@ class ANF_Axon(ANF):
             terminal_nseg=1,
             diam=1.5,
             weight=None,
+            meta=None,
     ):
         """nodes: number of nodes in the model.  Total number of
                compartments if 2*nodes.
@@ -425,6 +436,8 @@ class ANF_Axon(ANF):
             can be returned with `get_voltages`.
         weight : float, optional
             Synaptic weight.
+        meta : dict, optional
+            Meta data that will be added to the output spike train.
 
         """
         logger.info("ANF temperature: {} C".format(h.celsius))
@@ -552,6 +565,13 @@ class ANF_Axon(ANF):
         self.sections = sections
         self.section_names = names
 
+
+
+        ### Meta data for spike trains
+        if meta is None:
+            self._meta = {'type': 'anf'}
+        else:
+            self._meta = meta
 
 
 
