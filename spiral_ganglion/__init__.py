@@ -34,9 +34,8 @@ from . ci import (
     find_threshold,
 )
 
+from . ear import run_holmberg2007_sg
 
-import signals
-import ci
 
 
 def run(duration, anfs):
