@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function, absolute_import
+from __future__ import unicode_literals
 
 __author__ = "Marek Rudnicki"
 
@@ -16,19 +16,19 @@ import os
 lib_dir = os.path.dirname(__file__)
 neuron.load_mechanisms(lib_dir)
 
-from anf import (
+from . anf import (
     ANF_Axon,
     plot_geometry,
     plot_vectors,
     generate_anf_config,
 )
 
-from electrodes import (
+from . electrodes import (
     Electrode,
     calculate_medel_electrode_z_position,
 )
 
-from ci import (
+from . ci import (
     run_ci_simulation,
     make_anf_electrode,
     find_threshold,
