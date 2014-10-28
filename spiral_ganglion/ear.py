@@ -63,6 +63,10 @@ def run_holmberg2007_sg(
 
     duration = th.get_duration(vesicle_trains)
 
+
+    sg.set_celsius(37)
+    sg.set_fs(100e3)
+
     anfs = []
     for _,train in vesicle_trains.iterrows():
         anf = sg.ANF_Axon(
@@ -74,8 +78,6 @@ def run_holmberg2007_sg(
         anfs.append(anf)
 
 
-    sg.set_celsius(37)
-    sg.set_fs(100e3)
     sg.run(
         duration=duration,
         anfs=anfs

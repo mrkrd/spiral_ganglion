@@ -30,9 +30,9 @@ def main():
     sound = wv.ramped_tone(
         fs=fs,
         freq=cf,
-        duration=50e-3,
+        duration=150e-3,
         pad=10e-3,
-        dbspl=50,
+        dbspl=70,
     )
 
 
@@ -46,6 +46,8 @@ def main():
         seed=0,
     )
 
+
+    print(th.firing_rate(anf_trains))
 
 
     ### Plot auditory nerve response
