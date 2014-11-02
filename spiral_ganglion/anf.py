@@ -516,7 +516,11 @@ class ANF_Axon(ANF):
         self._con = h.NetCon(None, self._syn)
         self._con.delay = 0
         if weight is None:
-            self._con.weight[0] = 0.000716352978448 * calc_tf(q10=1.5) # * 1e6
+            ### Weight at 22C from an EPSC fit to Li et al. (2009)
+            ### (spiral_ganglion_notes/li2009_epsc_fit/run_epsc_fit.py);
+            ### Q10 from rate fit at 37C
+            ### (spiral_ganglion_notes/acoustic_q10_weight/find_best_weight.py)
+            self._con.weight[0] = 1e6 * 5.5686753127e-10 * calc_tf(q10=1.26289815639)
         else:
             self._con.weight[0] = 1e6 * weight
 
