@@ -217,7 +217,8 @@ class ANF(object):
         Note: must be called *before* neuron.init()
 
         """
-        assert h.dt <= dt_assert, "h.dt = {}, dt_assert = {}".format(h.dt, dt_assert)
+        if h.dt > dt_assert:
+            raise ValueError("h.dt should be smaller than {dt_assert}, current value is {dt}".format(dt_assert=dt_assert, dt=h.dt))
 
         for sec in self.sections:
             sec.v = self._vrest
