@@ -261,7 +261,7 @@ def _run_single_electrode(
     )
 
     sg.run(
-        tmax=(len(electrode.stim) / electrode.fs),
+        duration=(len(electrode.stim) / electrode.fs),
         anfs=[anf]
     )
 
