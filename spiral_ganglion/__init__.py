@@ -36,6 +36,7 @@ from . ci import (
 
 from . ear import run_holmberg2007_sg
 
+from cochlea import get_nearest_cf_holmberg2007
 
 
 def run(duration, anfs):
