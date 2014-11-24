@@ -259,24 +259,12 @@ def generate_anf_config(
 
     ena = 66
     ek = -88
-    e_pas = -78
 
     cfg = {}
-    cfg['internode_channels'] = [
-        'pas',
-        'extracellular'
-    ]
-    cfg['internode_vars'] = {
-        'nseg': 1,
-        'L': 250,
-        'Ra': 100,
-        'diam': diam,
-        'cm': 1e-3,
-        'g_pas': g_pas,
-        'e_pas': e_pas
-    }
 
     if name == 'schwarz1987_klt':
+        vrest = -63.
+        e_pas = -78.
         cfg['node_channels'] = [
             'na_schwarz1987',
             'k_schwarz1987',
@@ -298,19 +286,33 @@ def generate_anf_config(
             'g_pas': g_pas,
             'ena': ena,
             'ek': ek,
-            'e_pas': e_pas
+            'e_pas': e_pas,
+        }
+        cfg['internode_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['internode_vars'] = {
+            'nseg': 1,
+            'L': 250,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 1e-3,
+            'g_pas': g_pas,
+            'e_pas': e_pas,
         }
         cfg['global_vars'] = {
-            'vrest_na_schwarz1987': -78,
-            'vrest_k_schwarz1987': -78,
-            'vrest_klt_rothman2003': -78,
-            'vrest_ih_rothman2003': -78
+            'vrest_na_schwarz1987': vrest,
+            'vrest_k_schwarz1987': vrest,
+            'vrest_klt_rothman2003': vrest,
+            'vrest_ih_rothman2003': vrest,
         }
-        cfg['vrest'] = -73
+        cfg['vrest'] = vrest
 
 
 
     elif name == 'schwarz1987_pure':
+        vrest = -78.
         cfg['node_channels'] = [
             'na_schwarz1987',
             'k_schwarz1987',
@@ -328,13 +330,26 @@ def generate_anf_config(
             'g_pas': g_pas,
             'ena': ena,
             'ek': ek,
-            'e_pas': e_pas
+            'e_pas': vrest
+        }
+        cfg['internode_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['internode_vars'] = {
+            'nseg': 1,
+            'L': 250,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 1e-3,
+            'g_pas': g_pas,
+            'e_pas': vrest
         }
         cfg['global_vars'] = {
-            'vrest_na_schwarz1987': -78,
-            'vrest_k_schwarz1987': -78,
+            'vrest_na_schwarz1987': vrest,
+            'vrest_k_schwarz1987': vrest,
         }
-        cfg['vrest'] = -78
+        cfg['vrest'] = vrest
 
 
 
@@ -350,7 +365,20 @@ def generate_anf_config(
             'diam': diam,
             'cm': 0.9,
             'g_pas': g_pas,
-            'e_pas': e_pas
+            'e_pas': vrest
+        }
+        cfg['internode_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['internode_vars'] = {
+            'nseg': 1,
+            'L': 250,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 1e-3,
+            'g_pas': g_pas,
+            'e_pas': vrest
         }
         cfg['global_vars'] = {
         }
@@ -379,7 +407,20 @@ def generate_anf_config(
             'g_pas': g_pas,
             'ena': ena,
             'ek': ek,
-            'e_pas': e_pas
+            'e_pas': vrest
+        }
+        cfg['internode_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['internode_vars'] = {
+            'nseg': 1,
+            'L': 250,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 1e-3,
+            'g_pas': g_pas,
+            'e_pas': vrest
         }
         cfg['global_vars'] = {
             'vrest_na_rothman1993': -64,
@@ -451,7 +492,7 @@ class ANF_Axon(ANF):
         self.electrodes = []    # electrodes that stimulate the neuron
                                 # (class Electrode)
 
-        if isinstance(channels, str):
+        if not isinstance(channels, dict):
             cfg = generate_anf_config(
                 channels,
                 diam=diam
