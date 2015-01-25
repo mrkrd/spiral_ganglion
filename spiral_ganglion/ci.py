@@ -119,11 +119,11 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
     anf.electrodes = electrodes
 
     tmax = max([len(el.stim) for el in electrodes])
-    tmax = tmax / electrodes[0].fs
+    duration = tmax / electrodes[0].fs
 
 
     sg.run(
-        tmax=tmax,
+        duration=duration,
         anfs=[anf]
     )
 
