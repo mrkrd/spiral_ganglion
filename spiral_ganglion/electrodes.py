@@ -47,14 +47,10 @@ class Electrode(object):
         z_decay_factor = 10**exponent
         stim = z_decay_factor * self.stim
 
-        # Calculate homogenious medium (1/r) (resistivity = 300 ohm*cm
-        # = 3 ohm*m)
+        # Calculate homogenious medium (1/r)
+        resistivity = 3         # resistivity = 300 ohm*cm = 3 ohm*m
         r = np.sqrt((self.x - anf_pos.x)**2 + (self.y - anf_pos.y)**2)
-        node_factors = 3 / (4 * np.pi * r)
-
-        # import matplotlib.pyplot as plt
-        # plt.plot(node_factors)
-        # plt.show()
+        node_factors = resistivity / (4 * np.pi * r)
 
         potentials = np.outer(node_factors, stim)
 
