@@ -6,6 +6,7 @@ __author__ = "Marek Rudnicki"
 
 import numpy as np
 
+
 class Electrode(object):
     """Point electrode located at (x, y, z) coordinates.
 
@@ -24,7 +25,6 @@ class Electrode(object):
         self.stim = None        # [A]
         self.fs = None          # [Hz]
 
-
     def calculate_potentials(self, anf):
         """
         Calculate electrical potential for each segment of the ANF.
@@ -35,8 +35,7 @@ class Electrode(object):
 
         anf_pos = anf.get_positions()
 
-
-        ### Calculate decay along cochlea
+        # Calculate decay along cochlea
         gain_dB = -1e3          # [dB/m]: -1dB/mm
         z_anf = anf_pos.z[0]
         assert np.all(anf_pos.z == z_anf)
@@ -45,10 +44,8 @@ class Electrode(object):
         z_decay_factor = 10**exponent
         stim = z_decay_factor * self.stim
 
-
-
-        ### Calculate homogenious medium (1/r)
-        # resistivity = 300 ohm*cm = 3 ohm*m
+        # Calculate homogenious medium (1/r) (resistivity = 300 ohm*cm
+        # = 3 ohm*m)
         r = np.sqrt((self.x - anf_pos.x)**2 + (self.y - anf_pos.y)**2)
         node_factors = 3 / (4 * np.pi * r)
 
