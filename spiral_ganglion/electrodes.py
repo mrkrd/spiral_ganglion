@@ -12,9 +12,12 @@ class Electrode(object):
 
     Attributes
     ----------
-
     x, y, z : float
-        Electrode position in [m].
+        Electrode position (m).
+    stim : array_like
+        Electric current (A).
+    fs : scalar
+        Sampling frequency of the electric current vector (Hz).
 
     """
     def __init__(self):
@@ -62,11 +65,3 @@ def calculate_medel_electrode_z_position(electrode_number):
     z = np.linspace(4.6e-3, 31e-3, 12)[electrode_number-1]
 
     return z
-
-
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()
