@@ -413,10 +413,25 @@ def generate_anf_config(
 
 
 class ANF_Axon(ANF):
-    """
-    Model of Auditory Nerve Fiber's peripherial axon.  Can be used
-    for acoustical and electrical stimulation.
+    """Model of spiral ganglion's peripherial axon.  It can be used for
+    acoustical and electrical stimulation.
 
+    Parameters
+    ----------
+    nodes : int
+        Number of nodes in the model. Total number of compartments
+        (nodes + internodes) is 2*nodes.
+    record_voltages : bool
+        When True membrane potentials are recorded internally and
+        can be returned with `get_voltages`.
+    weight : float, optional
+        Synaptic weight.
+    meta : dict, optional
+        Meta data that will be added to the output spike train.
+
+
+    Example
+    -------
     anf = ANF_Axon()
 
     ### Acoustical stimulation
@@ -444,18 +459,6 @@ class ANF_Axon(ANF):
             weight=None,
             meta=None,
     ):
-        """nodes: number of nodes in the model.  Total number of
-               compartments if 2*nodes.
-
-        record_voltages : bool
-            When True membrane potentials are recorded internally and
-            can be returned with `get_voltages`.
-        weight : float, optional
-            Synaptic weight.
-        meta : dict, optional
-            Meta data that will be added to the output spike train.
-
-        """
         logger.info("ANF temperature: {} C".format(h.celsius))
 
         # vesicle timings for acoustical stimulation
@@ -640,7 +643,7 @@ def plot_geometry(objects):
             y = pos['y']
             z = pos['z']
 
-        _plot_object(x,y,z, fmt, fig)
+        _plot_object(x, y, z, fmt, fig)
 
     # return fig
 
