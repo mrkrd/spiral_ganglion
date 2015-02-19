@@ -8,38 +8,34 @@ import numpy as np
 import pandas as pd
 import logging
 
-import neuron
 from neuron import h
 
 from spiral_ganglion.electrodes import Electrode
 
 logger = logging.getLogger(__name__)
 
+
 def calc_tf(q10, temp_ref=22):
     tf = q10 ** ((h.celsius - temp_ref)/10)
     return tf
 
 
-
 def _check_voltage_range(voltage):
 
-    v = np.array(voltage) * 1e-3 # [V]
+    v = np.array(voltage) * 1e-3  # mV -> V
 
     assert np.all(-0.16 < v)
     assert np.all(v < 0.1)
-
 
 
 class ANF(object):
 
     def get_sections(self, name=None):
         selected = []
-        for typ,sec in zip(self.section_names, self.sections):
+        for typ, sec in zip(self.section_names, self.sections):
             if (name is None) or (typ == name):
                 selected.append(sec)
         return selected
-
-
 
     def _get_segments(self):
         """ Returns list of all segments along the neuron """
@@ -49,8 +45,6 @@ class ANF(object):
             idx = [seg.x for seg in sec]
             segments.extend([sec(i) for i in idx])
         return segments
-
-
 
     def _get_segment_path_positions(self):
         """Returns a list of positions of all segments along the
@@ -62,14 +56,13 @@ class ANF(object):
         positions = []
         start = 0               # beginning of the currenct section
         for sec in self.sections:
-            seg_x = np.array([seg.x for seg in sec])   # [1]
-            positions.extend(start + seg_x*1e-6*sec.L) # um -> m
-            start = start + 1e-6*sec.L                 # um -> m
+            seg_x = np.array([seg.x for seg in sec])    # [1]
+            positions.extend(start + seg_x*1e-6*sec.L)  # um -> m
+            start = start + 1e-6*sec.L                  # um -> m
 
         positions = np.array(positions)
 
         return positions
-
 
     def set_geometry(self, geometry, **kwargs):
         """Sets position of each segment of the neuron.
@@ -92,8 +85,6 @@ class ANF(object):
         self._geometry = geometry
         self._geometry_pars = kwargs
 
-
-
     def get_positions(self):
         """Return position of all segments of the neuron."""
         ppos = self._get_segment_path_positions()
@@ -113,23 +104,21 @@ class ANF(object):
             r = b
             shift = np.abs(a-b)
 
-
             circumference = 2 * np.pi * r
             quarter = circumference / 4
 
-
             # Initial straight segment
-            sel = ppos[ (ppos<shift) ]
+            sel = ppos[(ppos < shift)]
             x = sel
             y = b * np.ones(len(sel))
 
             # Quarter circle segment
-            sel = ppos[ (ppos>=shift) & (ppos<(quarter+shift)) ] - shift
+            sel = ppos[(ppos >= shift) & (ppos < (quarter+shift))] - shift
             x = np.append(x, shift + r*np.sin(2 * np.pi * sel / circumference))
             y = np.append(y, r*np.cos(2 * np.pi * sel / circumference))
 
             # Remaining straight segment
-            sel = ppos[ (ppos>=(quarter+shift)) ] - shift - quarter
+            sel = ppos[(ppos >= (quarter+shift))] - shift - quarter
 
             x = np.append(x, a*np.ones(len(sel)))
             y = np.append(y, -sel)
@@ -140,17 +129,15 @@ class ANF(object):
             # plt.show()
 
         positions = np.rec.fromarrays(
-            [x,y,z],
+            [x, y, z],
             names='x,y,z'
         )
         return positions
 
-
     def get_voltages(self):
-        """
-        Returns time courses of membrane potentials for each section
-        of the model.  Potentials are recorded in the from the middle
-        of each section: sec(0.5).
+        """Returns time courses of membrane potentials for each section of
+        the model.  Potentials are recorded in the from the middle of
+        each section: sec(0.5).
 
         The neuron must be initialized with `record_voltages=True'.
 
@@ -163,7 +150,6 @@ class ANF(object):
         voltages *= 1e-3        # mV -> V
 
         return voltages
-
 
     def get_trains(self):
         """Return an array of spike trains recorded from the last
@@ -185,13 +171,14 @@ class ANF(object):
 
         return train
 
-
     def get_spikes(self):
-        """Get raw spike times.  See also `get_trains` for spike_trains output."""
+        """Get raw spike times.  See also `get_trains` for spike_trains
+        output.
+
+        """
         assert h.t != 0, "Time is 0 (did you run the simulation already?)"
         spikes = 1e-3*np.array(self._spikes)
         return spikes
-
 
     def ainit(self):
         """
@@ -207,8 +194,6 @@ class ANF(object):
 
         for v in self.vesicles:
             self._con.event(float(v*1e3))
-
-
 
     def einit(self, dt_assert=0.002):
         """
@@ -230,19 +215,16 @@ class ANF(object):
             fs = fss[0]
             assert fs is not None
             assert np.all(fss == fs)
-            el_dt = float(1000/fs) # Hz -> ms
+            el_dt = float(1000/fs)  # Hz -> ms
 
             potentials = sum([
                 el.calculate_potentials(self) for el in self.electrodes
             ])
 
-
-            for pot,seg in zip(potentials, self._get_segments()):
-                vec = h.Vector(pot*1e3) # V -> mV
+            for pot, seg in zip(potentials, self._get_segments()):
+                vec = h.Vector(pot*1e3)  # V -> mV
                 vec.play(seg._ref_e_extracellular, el_dt)
                 self._stim_vectors.append(vec)
-
-
 
 
 def generate_anf_config(
@@ -255,7 +237,7 @@ def generate_anf_config(
     g_kv = calc_conductivity_cm2(50.0e-12, capacity) * 166
     g_klt = calc_conductivity_cm2(13.0e-12, capacity) * 166
     g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
-    g_pas = 1e-5 #calc_conductivity_cm2(1/1953.49e6, capacity)
+    g_pas = 1e-5         # calc_conductivity_cm2(1/1953.49e6, capacity)
 
     ena = 66
     ek = -88
@@ -309,8 +291,6 @@ def generate_anf_config(
         }
         cfg['vrest'] = vrest
 
-
-
     elif name == 'schwarz1987_pure':
         vrest = -78.
         cfg['node_channels'] = [
@@ -351,8 +331,6 @@ def generate_anf_config(
         }
         cfg['vrest'] = vrest
 
-
-
     elif name == 'passive_only':
         cfg['node_channels'] = [
             'pas',
@@ -383,8 +361,6 @@ def generate_anf_config(
         cfg['global_vars'] = {
         }
         cfg['vrest'] = -78
-
-
 
     elif name == 'rothman1993_klt':
         cfg['node_channels'] = [
@@ -430,12 +406,10 @@ def generate_anf_config(
         }
         cfg['vrest'] = -64
 
-
     else:
         raise RuntimeError("Unknown channel config name: {}".format(name))
 
     return cfg
-
 
 
 class ANF_Axon(ANF):
@@ -484,72 +458,63 @@ class ANF_Axon(ANF):
         """
         logger.info("ANF temperature: {} C".format(h.celsius))
 
-
-        self.vesicles = [] # vesicle timings for acoustical stimulation
+        # vesicle timings for acoustical stimulation
+        self.vesicles = []
 
         self._geometry = None
 
-        self.electrodes = []    # electrodes that stimulate the neuron
-                                # (class Electrode)
+        # electrodes that stimulate the neuron (class Electrode)
+        self.electrodes = []
 
         if not isinstance(channels, dict):
             cfg = generate_anf_config(
                 channels,
                 diam=diam
             )
-
         else:
             cfg = channels
-
 
         sections = []
         names = []
         for i in range(nodes):
-            ### Node sections
+            # Node sections
             sec = h.Section()
 
             for chan in cfg['node_channels']:
                 sec.insert(chan)
-            for var,val in cfg['node_vars'].items():
+            for var, val in cfg['node_vars'].items():
                 setattr(sec, var, val)
 
             sections.append(sec)
             names.append('node')
 
-
-            ### Internode sections
+            # Internode sections
             sec = h.Section()
 
             for chan in cfg['internode_channels']:
                 sec.insert(chan)
-            for var,val in cfg['internode_vars'].items():
+            for var, val in cfg['internode_vars'].items():
                 setattr(sec, var, val)
 
             sections.append(sec)
             names.append('internode')
 
-
-
-        for var,val in cfg['global_vars'].items():
+        for var, val in cfg['global_vars'].items():
             setattr(h, var, val)
 
-
-        ### Terminal node
+        # Terminal node
         sections[0].L = terminal_length
         sections[0].nseg = terminal_nseg
-
 
         for sec in sections:
             sec.v = cfg['vrest']
         self._vrest = cfg['vrest']
 
-
         # Connect sections
-        for a,b in zip(sections[:-1], sections[1:]):
+        for a, b in zip(sections[:-1], sections[1:]):
             b.connect(a)
 
-
-        ### IHC Synapse
+        # IHC Synapse
         self._syn = h.Exp2Syn(sections[0](0.5))
         self._syn.tau1 = 0.000392876886274 * 1e3 / calc_tf(q10=2.4)
         self._syn.tau2 = 0.000392990435175 * 1e3 / calc_tf(q10=2.4)
@@ -558,31 +523,28 @@ class ANF_Axon(ANF):
         self._con = h.NetCon(None, self._syn)
         self._con.delay = 0
         if weight is None:
-            ### Weight at 22C from an EPSC fit to Li et al. (2009)
-            ### (spiral_ganglion_notes/li2009_epsc_fit/run_epsc_fit.py);
-            ### Q10 from rate fit at 37C
-            ### (spiral_ganglion_notes/acoustic_q10_weight/find_best_weight.py)
+            # Weight at 22C from an EPSC fit to Li et al. (2009)
+            # (spiral_ganglion_notes/li2009_epsc_fit/run_epsc_fit.py);
+            # Q10 from rate fit at 37C
+            # (spiral_ganglion_notes/acoustic_q10_weight/find_best_weight.py)
             self._con.weight[0] = 1e6 * 5.5686753127e-10 * calc_tf(q10=1.26289815639)
         else:
             self._con.weight[0] = 1e6 * weight
 
-
-        ### Recording spikes from the last section
+        # Recording spikes from the last section
         last = sections[-1]
         self._probe = h.NetCon(last(0.5)._ref_v, None, 0, 0, 0, sec=last)
         self._spikes = h.Vector()
         self._probe.record(self._spikes)
 
-
-        ### Record voltages from the last section
+        # Record voltages from the last section
         last_voltage = h.Vector()
         last_voltage.record(
             sections[-1](0.5)._ref_v
         )
         self._last_voltage = last_voltage
 
-
-        ### Recording voltages from all sections
+        # Recording voltages from all sections
         self._voltages = []
         if record_voltages:
             logger.info("Recording voltages is on")
@@ -600,36 +562,27 @@ class ANF_Axon(ANF):
                     # except Exception:
                     #     pass
 
-
                 # vec = h.Vector()
                 # vec.record(sec(0.5)._ref_v)
                 # self._voltages.append(vec)
-
-
 
         assert len(sections) == len(names)
         self.sections = sections
         self.section_names = names
 
-
-
-        ### Meta data for spike trains
+        # Meta data for spike trains
         if meta is None:
             self._meta = {'type': 'anf'}
         else:
             self._meta = meta
 
 
-
 def calc_conductivity_cm2(conductance, capacity):
     cm = 0.9e-6                 # [F/cm2]
     area = capacity / cm        # [cm2]
 
-    conductivity = conductance / area # [S/cm2]
+    conductivity = conductance / area  # [S/cm2]
     return conductivity
-
-
-
 
 
 def plot_vectors(vectors, axes=None, fs=None):
@@ -637,7 +590,7 @@ def plot_vectors(vectors, axes=None, fs=None):
     import matplotlib.pyplot as plt
 
     if axes is None:
-        fig,axes = plt.subplots(
+        fig, axes = plt.subplots(
             vectors.shape[1],
             1,
             sharex=True,
@@ -647,8 +600,7 @@ def plot_vectors(vectors, axes=None, fs=None):
         assert len(axes) == vectors.shape[1]
         fig = plt.gcf()
 
-
-    for v,a in zip(vectors.T, axes):
+    for v, a in zip(vectors.T, axes):
         lines = a.plot(v)
         a.patch.set_visible(False)
         a.set_frame_on(False)
@@ -660,9 +612,7 @@ def plot_vectors(vectors, axes=None, fs=None):
     a.set_frame_on(True)
     # a.axes.get_xaxis().set_visible(True)
 
-    # return fig,axes
-
-
+    return fig, axes
 
 
 def plot_geometry(objects):
@@ -683,38 +633,35 @@ def plot_geometry(objects):
             y = obj.y
             z = obj.z
 
-        elif isinstance (obj, ANF):
+        elif isinstance(obj, ANF):
             pos = obj.get_positions()
             fmt = 'ko'
             x = pos['x']
             y = pos['y']
             z = pos['z']
 
-
         _plot_object(x,y,z, fmt, fig)
 
     # return fig
 
 
-def _plot_object(x,y,z, fmt, fig):
+def _plot_object(x, y, z, fmt, fig):
 
     xy, zy, xz = fig.axes
 
-    xy.plot(x,y,fmt)
+    xy.plot(x, y, fmt)
     xy.set_title("XY")
     xy.set_xlabel("X [m]")
     xy.set_ylabel("Y [m]")
     xy.set_aspect('equal', 'datalim')
 
-
-    zy.plot(z,y,fmt)
+    zy.plot(z, y, fmt)
     zy.set_title("ZY")
     zy.set_xlabel("Z [m]")
     zy.set_ylabel("Y [m]")
     zy.set_aspect('equal', 'datalim')
 
-
-    xz.plot(x,z,fmt)
+    xz.plot(x, z, fmt)
     xz.set_title("XZ")
     xz.set_xlabel("X [m]")
     xz.set_ylabel("Z [m]")

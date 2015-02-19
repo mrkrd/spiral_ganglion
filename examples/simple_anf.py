@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 import spiral_ganglion as sg
 
-import neuron
 from neuron import h
 
 
@@ -22,9 +21,7 @@ def main():
     sg.set_fs(fs)
     sg.set_celsius(37)
 
-
-
-    ### Acoustic stimmulation
+    # Acoustic stimmulation
     anf_ac = sg.ANF_Axon(record_voltages=True)
 
     h.topology()
@@ -34,11 +31,7 @@ def main():
 
     anf_ac.vesicles = [2e-3, 5e-3]
 
-
-
-
-
-    ### Electrical stimulation
+    # Electrical stimulation
 
     # set-up ANF
     anf_el = sg.ANF_Axon(record_voltages=True)
@@ -49,9 +42,8 @@ def main():
     el = sg.Electrode()
     el.z = 0
 
-
     stim = np.zeros(tmax * fs)
-    stim[tmax/3*fs:(tmax/3+1e-3)*fs] = -0.2e-3 # [A]
+    stim[tmax/3*fs:(tmax/3+1e-3)*fs] = -0.2e-3  # (A)
 
     el.fs = fs
     el.stim = stim
@@ -59,31 +51,25 @@ def main():
     # `connect' ANF and electrode
     anf_el.electrodes = [el]
 
-
-
-
-
-    ### Run
+    # Run
     sg.run(
         tmax,
         [anf_ac, anf_el]
     )
 
-
-
-    # plot
+    # Plot
     print(anf_ac.get_spikes(), anf_el.get_spikes())
 
     sg.plot_vectors(
-        anf_ac.get_voltages()[:,0:6]
+        anf_ac.get_voltages()[:, 0:6]
     )
 
     sg.plot_vectors(
-        anf_el.get_voltages()[:,0:6]
+        anf_el.get_voltages()[:, 0:6]
     )
 
     sg.plot_geometry(
-        [anf_el,el]
+        [anf_el, el]
     )
 
     plt.show()
