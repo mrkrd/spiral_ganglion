@@ -77,6 +77,15 @@ class ANF(object):
         x0, y0: are in the plane of cross section of scala tympani
         z0: coordinate along cochlea
 
+         y ^
+           |
+           |     o==o==o==o==o==o==...
+           | (x0,y0,z0)
+           |
+           +---------------->
+        (0,0,0)             x
+
+
         'bent'
         a, b: distances to the neuron along x and y axis respectively
         z: position along cochlea
