@@ -341,6 +341,7 @@ def generate_anf_config(
         cfg['vrest'] = vrest
 
     elif name == 'passive_only':
+        vrest = -78
         cfg['node_channels'] = [
             'pas',
             'extracellular'
