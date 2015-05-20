@@ -46,19 +46,32 @@ class ANF(object):
             segments.extend([sec(i) for i in idx])
         return segments
 
-    def _get_segment_path_positions(self):
+    def _get_segment_path_positions(self, section_type=None):
         """Returns a list of positions of all segments along the
-        neuron in [m]
+        neuron in meter (m).
+
+        Parameters
+        ----------
+        section_type : {None, 'node', 'internode'}, optional
+            Will return segment path positions of the given section
+            type only.
+
+        Returns
+        -------
+        ndarray
+            Segment positions.
+
 
         TODO: implement using h.Section().distance()
 
         """
         positions = []
         start = 0               # beginning of the currenct section
-        for sec in self.sections:
-            seg_x = np.array([seg.x for seg in sec])    # [1]
-            positions.extend(start + seg_x*1e-6*sec.L)  # um -> m
-            start = start + 1e-6*sec.L                  # um -> m
+        for typ, sec in zip(self.section_names, self.sections):
+            if (section_type is None) or (typ == section_type):
+                seg_x = np.array([seg.x for seg in sec])    # [1]
+                positions.extend(start + seg_x*sec.L*1e-6)  # um -> m
+                start = start + 1e-6*sec.L                  # um -> m
 
         positions = np.array(positions)
 
@@ -99,7 +112,9 @@ class ANF(object):
         ppos = self._get_segment_path_positions()
 
         if self._geometry is None:
-            raise RuntimeError("Neuron's geometry not set. Call anf.set_geometry()")
+            raise RuntimeError(
+                "Neuron's geometry not set. Call anf.set_geometry() first."
+            )
 
         elif self._geometry == 'straight':
             x = self._geometry_pars['x0'] + ppos
