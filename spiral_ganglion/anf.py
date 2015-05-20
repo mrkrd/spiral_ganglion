@@ -53,8 +53,8 @@ class ANF(object):
         Parameters
         ----------
         section_type : {None, 'node', 'internode'}, optional
-            Will return segment path positions of the given section
-            type only.
+            Return segment path positions of the given section type
+            only.
 
         Returns
         -------
@@ -107,9 +107,22 @@ class ANF(object):
         self._geometry = geometry
         self._geometry_pars = kwargs
 
-    def get_positions(self):
-        """Return position of all segments of the neuron."""
-        ppos = self._get_segment_path_positions()
+    def get_positions(self, section_type=None):
+        """Return position of all segments of the neuron.
+
+        Parameters
+        ----------
+        section_type : {None, 'node', 'internode'}, optional
+            Return segment path positions of the given section type
+            only.
+
+        Returns
+        -------
+        ndarray
+            (x,y,x) coordinates of every segment in the model.
+
+        """
+        ppos = self._get_segment_path_positions(section_type=section_type)
 
         if self._geometry is None:
             raise RuntimeError(
