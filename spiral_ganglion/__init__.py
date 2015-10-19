@@ -66,7 +66,6 @@ def run(duration, anfs):
     neuron.run(duration * 1e3)      # s -> ms
 
 
-
 def set_celsius(celsius):
     h.celsius = celsius
 
@@ -80,7 +79,6 @@ def show():
     plt.show()
 
 
-
 def find_action_potentials(voltages, fs):
 
     aps = []
@@ -88,10 +86,9 @@ def find_action_potentials(voltages, fs):
         positive = np.array((v > 0), dtype=int)
         diff = np.diff(positive)
 
-        ## Range of the last AP
-        imin = np.where(diff==+1)[0][-1]
-        imax = np.where(diff==-1)[0][-1]
-
+        # Range of the last AP
+        imin = np.where(diff == +1)[0][-1]
+        imax = np.where(diff == -1)[0][-1]
 
         icenter = np.argmax(v[imin:imax])
 

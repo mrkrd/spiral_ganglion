@@ -1,0 +1,2 @@
+
+* Implement run_ci_simulation using thorns.util.map()

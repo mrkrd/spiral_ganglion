@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+from __future__ import unicode_literals
 
 __author__ = "Marek Rudnicki"
 
@@ -38,7 +39,7 @@ class ANF(object):
         return selected
 
     def _get_segments(self):
-        """ Returns list of all segments along the neuron """
+        """Returns list of all segments along the neuron."""
         sections = self.sections
         segments = []
         for sec in sections:
@@ -167,12 +168,12 @@ class ANF(object):
 
         positions = np.rec.fromarrays(
             [x, y, z],
-            names='x,y,z'
+            names=['x', 'y', 'z']
         )
         return positions
 
     def get_voltages(self):
-        """Returns time courses of membrane potentials for each section of
+        """Return time courses of membrane potentials for each section of
         the model.  Potentials are recorded in the from the middle of
         each section: sec(0.5).
 
@@ -258,7 +259,11 @@ class ANF(object):
                 el.calculate_potentials(self) for el in self.electrodes
             ])
 
-            for pot, seg in zip(potentials, self._get_segments()):
+            segments = self._get_segments()
+
+            assert len(potentials) == len(segments)
+
+            for pot, seg in zip(potentials, segments):
                 vec = h.Vector(pot*1e3)  # V -> mV
                 vec.play(seg._ref_e_extracellular, el_dt)
                 self._stim_vectors.append(vec)
@@ -593,7 +598,6 @@ class ANF_Axon(ANF):
             for sec in sections:
                 for seg in sec:
                     vec = h.Vector()
-
                     vec.record(seg._ref_v)
                     self._voltages.append(vec)
 
@@ -626,22 +630,19 @@ def calc_conductivity_cm2(conductance, capacity):
     return conductivity
 
 
-def plot_vectors(vectors, axes=None, fs=None):
+def plot_vectors(vectors, fs):
+    """TODO: use single axis, move to thorns"""
 
     import matplotlib.pyplot as plt
 
-    if axes is None:
-        fig, axes = plt.subplots(
-            vectors.shape[1],
-            1,
-            sharex=True,
-            sharey=True
-        )
-    else:
-        assert len(axes) == vectors.shape[1]
-        fig = plt.gcf()
+    fig, ax = plt.subplots(
+        vectors.shape[1],
+        1,
+        sharex=True,
+        sharey=True
+    )
 
-    for v, a in zip(vectors.T, axes):
+    for v, a in zip(vectors.T, ax):
         lines = a.plot(v)
         a.patch.set_visible(False)
         a.set_frame_on(False)
@@ -651,9 +652,9 @@ def plot_vectors(vectors, axes=None, fs=None):
             line.set_clip_on(False)
 
     a.set_frame_on(True)
-    # a.axes.get_xaxis().set_visible(True)
+    # a.ax.get_xaxis().set_visible(True)
 
-    return fig, axes
+    return fig, ax
 
 
 def plot_geometry(objects):

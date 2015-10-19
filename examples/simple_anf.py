@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function, absolute_import
+from __future__ import unicode_literals
 
 __author__ = "Marek Rudnicki"
 
@@ -61,11 +61,11 @@ def main():
     print(anf_ac.get_spikes(), anf_el.get_spikes())
 
     sg.plot_vectors(
-        anf_ac.get_voltages()[:, 0:6]
+        anf_ac.get_voltages()[:, 0:6], fs
     )
 
     sg.plot_vectors(
-        anf_el.get_voltages()[:, 0:6]
+        anf_el.get_voltages()[:, 0:6], fs
     )
 
     sg.plot_geometry(

@@ -6,19 +6,15 @@ __author__ = "Marek Rudnicki"
 
 import numpy as np
 import multiprocessing
-import os
-import logging
 
 import pandas as pd
 
 import spiral_ganglion as sg
 
-
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
 
 
 def run_ci_simulation(
@@ -67,7 +63,7 @@ def run_ci_simulation(
         assert stim.ndim == 2
         assert stim.shape[1] == 12
 
-        for i,s in enumerate(stim.T):
+        for i, s in enumerate(stim.T):
             el = sg.Electrode()
             el.x = 300e-6
             el.z = sg.calculate_medel_electrode_z_position(i+1)
@@ -77,7 +73,6 @@ def run_ci_simulation(
 
     else:
         raise NotImplementedError("Unimplemented stimulus format.")
-
 
     anf_zs = np.linspace(0, 35e-3, anf_num)
 
@@ -97,13 +92,9 @@ def run_ci_simulation(
     else:
         raise NotImplementedError("Map backend not implementation: {}".format(map_backend))
 
-
     trains = pd.concat(trains)
 
     return trains
-
-
-
 
 
 def _simulate_anf_at( (z, electrodes, return_voltages) ):
@@ -121,20 +112,15 @@ def _simulate_anf_at( (z, electrodes, return_voltages) ):
     tmax = max([len(el.stim) for el in electrodes])
     duration = tmax / electrodes[0].fs
 
-
     sg.run(
         duration=duration,
         anfs=[anf]
     )
 
-
     if return_voltages:
         return anf.get_voltages()
     else:
         return anf.get_trains()
-
-
-
 
 
 def find_threshold(
@@ -204,7 +190,6 @@ def find_threshold(
         lo = hi
         hi = hi * 1.5
 
-
     logger.debug("Maximum value found: {hi}".format(hi=hi))
 
     # binary search for amp
@@ -237,7 +222,6 @@ def find_threshold(
     return amp
 
 
-
 def _run_single_electrode(
         anf,
         electrode,
@@ -245,10 +229,8 @@ def _run_single_electrode(
         stimulus,
         fs,
         pre_stimulus,
-        pad):
-
-
-
+        pad
+):
     if pad:
         pre_pad = np.zeros(10e-3 * fs)
         post_pad = np.zeros(5e-3 * fs)
