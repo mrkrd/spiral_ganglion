@@ -496,7 +496,7 @@ class ANF_Axon(ANF):
             nodes=20,
             record_voltages=False,
             channels='schwarz1987_pure',
-            terminal_length=10e-6,
+            terminal_length=10,
             terminal_nseg=1,
             diam=1.5,
             weight=None,
@@ -549,9 +549,7 @@ class ANF_Axon(ANF):
             setattr(h, var, val)
 
         # Terminal node
-        if terminal_length > 0.1:
-            raise RuntimeError("terminal_length should be in microns")
-        sections[0].L = terminal_length * 1e6 # m -> um
+        sections[0].L = terminal_length
         sections[0].nseg = terminal_nseg
 
         for sec in sections:
