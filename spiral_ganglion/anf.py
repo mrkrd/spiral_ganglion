@@ -47,7 +47,7 @@ class ANF(object):
             segments.extend([sec(i) for i in idx])
         return segments
 
-    def _get_segment_path_positions(self, section_type=None):
+    def get_segment_path_positions(self, section_type=None):
         """Returns a list of positions of all segments along the
         neuron in meter (m).
 
@@ -123,7 +123,7 @@ class ANF(object):
             (x,y,x) coordinates of every segment in the model.
 
         """
-        ppos = self._get_segment_path_positions(section_type=section_type)
+        ppos = self.get_segment_path_positions(section_type=section_type)
 
         if self._geometry is None:
             raise RuntimeError(
