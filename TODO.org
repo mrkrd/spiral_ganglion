@@ -1,2 +1,5 @@
+#+TITLE: TODO list for spiral_ganglion
+#+AUTHOR: Marek Rudnicki
+#+CATEGORY: sg
 
 * Implement run_ci_simulation using thorns.util.map()
