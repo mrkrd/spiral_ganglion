@@ -2,4 +2,4 @@
 #+AUTHOR: Marek Rudnicki
 #+CATEGORY: sg
 
-* Implement run_ci_simulation using thorns.util.map()
+* TODO Implement run_ci_simulation using thorns.util.map()
