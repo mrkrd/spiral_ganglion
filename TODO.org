@@ -3,3 +3,4 @@
 #+CATEGORY: sg
 
 * TODO Implement run_ci_simulation using thorns.util.map()
+* TODO Remove __author__ and similar
