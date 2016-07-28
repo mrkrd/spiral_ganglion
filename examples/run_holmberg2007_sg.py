@@ -8,10 +8,6 @@ integrated with a spiral ganglion models.
 from __future__ import division, print_function, absolute_import
 from __future__ import unicode_literals
 
-__author__ = "Marek Rudnicki"
-__copyright__ = "Copyright 2014, Marek Rudnicki"
-__license__ = "GPLv3+"
-
 import matplotlib.pyplot as plt
 
 import spiral_ganglion as sg

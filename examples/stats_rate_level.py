@@ -25,9 +25,6 @@ model.
 """
 from __future__ import division, absolute_import, print_function
 
-__author__ = "Marek Rudnicki"
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 
