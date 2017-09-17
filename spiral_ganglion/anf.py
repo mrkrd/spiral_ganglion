@@ -371,6 +371,46 @@ def generate_anf_config(
         }
         cfg['vrest'] = vrest
 
+    elif name == 'schwarz1987_pure2':
+        vrest = -78.
+        cfg['node_channels'] = [
+            'na_schwarz1987',
+            'k_schwarz1987',
+            'pas',
+            'extracellular'
+        ]
+        cfg['node_vars'] = {
+            'nseg': 1,
+            'L': 1,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 0.9,
+            'gnabar_na_schwarz1987': g_na,
+            'gkbar_k_schwarz1987': g_kv * 1.5,
+            'g_pas': g_pas,
+            'ena': ena,
+            'ek': ek,
+            'e_pas': vrest
+        }
+        cfg['internode_channels'] = [
+            'pas',
+            'extracellular'
+        ]
+        cfg['internode_vars'] = {
+            'nseg': 1,
+            'L': 250,
+            'Ra': 100,
+            'diam': diam,
+            'cm': 1e-3,
+            'g_pas': g_pas,
+            'e_pas': vrest
+        }
+        cfg['global_vars'] = {
+            'vrest_na_schwarz1987': vrest,
+            'vrest_k_schwarz1987': vrest,
+        }
+        cfg['vrest'] = vrest
+
     elif name == 'passive_only':
         vrest = -78
         cfg['node_channels'] = [
