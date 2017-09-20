@@ -271,13 +271,27 @@ def generate_anf_config(
         name,
         diam=1.5
 ):
-    capacity = 0.0714e-12
+    capacitance = 0.0714e-12
 
-    g_na = calc_conductivity_cm2(25.69e-12, capacity) * 1000
-    g_kv = calc_conductivity_cm2(50.0e-12, capacity) * 166
-    g_klt = calc_conductivity_cm2(13.0e-12, capacity) * 166
-    g_h = calc_conductivity_cm2(13.0e-12, capacity) * 100
-    g_pas = 1e-5         # calc_conductivity_cm2(1/1953.49e6, capacity)
+    # conductance is written as:
+    # (single_channel_conductance * number_of_channels)
+    g_na = calc_conductivity_cm2(
+        25.69e-12 * 1000,
+        capacitance
+    )
+    g_kv = calc_conductivity_cm2(
+        50.0e-12 * 166,
+        capacitance
+    )
+    g_klt = calc_conductivity_cm2(
+        13.0e-12 * 166,
+        capacitance
+    )
+    g_h = calc_conductivity_cm2(
+        13.0e-12 * 100,
+        capacitance
+    )
+    g_pas = 1e-5
 
     ena = 66
     ek = -88
@@ -347,46 +361,6 @@ def generate_anf_config(
             'cm': 0.9,
             'gnabar_na_schwarz1987': g_na,
             'gkbar_k_schwarz1987': g_kv,
-            'g_pas': g_pas,
-            'ena': ena,
-            'ek': ek,
-            'e_pas': vrest
-        }
-        cfg['internode_channels'] = [
-            'pas',
-            'extracellular'
-        ]
-        cfg['internode_vars'] = {
-            'nseg': 1,
-            'L': 250,
-            'Ra': 100,
-            'diam': diam,
-            'cm': 1e-3,
-            'g_pas': g_pas,
-            'e_pas': vrest
-        }
-        cfg['global_vars'] = {
-            'vrest_na_schwarz1987': vrest,
-            'vrest_k_schwarz1987': vrest,
-        }
-        cfg['vrest'] = vrest
-
-    elif name == 'schwarz1987_pure2':
-        vrest = -78.
-        cfg['node_channels'] = [
-            'na_schwarz1987',
-            'k_schwarz1987',
-            'pas',
-            'extracellular'
-        ]
-        cfg['node_vars'] = {
-            'nseg': 1,
-            'L': 1,
-            'Ra': 100,
-            'diam': diam,
-            'cm': 0.9,
-            'gnabar_na_schwarz1987': g_na,
-            'gkbar_k_schwarz1987': g_kv * 1.5,
             'g_pas': g_pas,
             'ena': ena,
             'ek': ek,
@@ -660,9 +634,9 @@ class ANF_Axon(ANF):
             self._meta = meta
 
 
-def calc_conductivity_cm2(conductance, capacity):
+def calc_conductivity_cm2(conductance, capacitance):
     cm = 0.9e-6                 # [F/cm2]
-    area = capacity / cm        # [cm2]
+    area = capacitance / cm        # [cm2]
 
     conductivity = conductance / area  # [S/cm2]
     return conductivity
