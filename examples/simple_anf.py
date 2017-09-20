@@ -40,8 +40,8 @@ def main():
     el = sg.Electrode()
     el.z = 0
 
-    stim = np.zeros(tmax * fs)
-    stim[tmax/3*fs:(tmax/3+1e-3)*fs] = -0.2e-3  # (A)
+    stim = np.zeros(int(tmax * fs))
+    stim[int(tmax/3*fs):int((tmax/3+1e-3)*fs)] = -0.2e-3  # (A)
 
     el.fs = fs
     el.stim = stim
