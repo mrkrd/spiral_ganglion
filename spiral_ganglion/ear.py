@@ -36,7 +36,8 @@ def run_holmberg2007_sg(
         anf_num,
         seed,
         cf=None,
-        weight=None
+        weight=None,
+        channels='schwarz1987_pure',
 ):
     """Run inner ear model by [Holmberg2007]_ in quantal mode combined
     with spiral ganglion neurons.
@@ -45,9 +46,10 @@ def run_holmberg2007_sg(
     ----------
     weight : float
         Synaptic weight of the IHC synapse.
+    channels : str or dict
+        Channels used in the ANF model.
 
     """
-
     vesicle_trains = cochlea.run_holmberg2007_vesicles(
         sound=sound,
         fs=fs,
@@ -58,14 +60,14 @@ def run_holmberg2007_sg(
 
     duration = th.get_duration(vesicle_trains)
 
-
     sg.set_celsius(37)
     sg.set_fs(100e3)
 
     anfs = []
-    for _,train in vesicle_trains.iterrows():
+    for _, train in vesicle_trains.iterrows():
         anf = sg.ANF_Axon(
             weight=weight,
+            channels=channels,
             meta={'type': train['type'], 'cf': train['cf']},
         )
 
