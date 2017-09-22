@@ -27,6 +27,6 @@ def test_get_segment_path_positions():
         10e-6 + 250e-6 + 1e-6 + 250e-6/2
     ])
 
-    actual = anf._get_segment_path_positions()
+    actual = anf.get_segment_path_positions()
 
     assert_equal(actual, expected)
