@@ -18,7 +18,7 @@ from . anf import (
     ANF_Axon,
     plot_geometry,
     plot_vectors,
-    generate_anf_config,
+    generate_anf_channels,
 )
 
 from . electrodes import (

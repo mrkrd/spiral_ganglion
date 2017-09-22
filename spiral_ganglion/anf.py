@@ -267,7 +267,7 @@ class ANF(object):
                 self._stim_vectors.append(vec)
 
 
-def generate_anf_config(
+def generate_anf_channels(
         name,
         diam=1.5
 ):
@@ -525,7 +525,7 @@ class ANF_Axon(ANF):
         self.electrodes = []
 
         if not isinstance(channels, dict):
-            cfg = generate_anf_config(
+            cfg = generate_anf_channels(
                 channels,
                 diam=diam
             )
