@@ -273,8 +273,9 @@ def generate_anf_channels(
 ):
     capacitance = 0.0714e-12
 
-    # conductance is written as:
+    # Conductance is written as:
     # (single_channel_conductance * number_of_channels)
+    # Ref: Negm and Bruce (2008) Table I
     g_na = calc_conductivity_cm2(
         25.69e-12 * 1000,
         capacitance
