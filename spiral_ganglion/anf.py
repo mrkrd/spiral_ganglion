@@ -586,7 +586,7 @@ class ANF_Axon(ANF):
             # (spiral_ganglion_notes/li2009_epsc_fit/run_epsc_fit.py);
             # Q10 from rate fit at 37C
             # (spiral_ganglion_notes/acoustic_q10_weight/find_best_weight.py)
-            self._con.weight[0] = 1e6 * 5.5686753127e-10 * calc_tf(q10=1.26289815639)
+            self._con.weight[0] = 1e6 * 5.5686753127e-10 * calc_tf(q10=1.25187741383)
         else:
             self._con.weight[0] = 1e6 * weight
 
