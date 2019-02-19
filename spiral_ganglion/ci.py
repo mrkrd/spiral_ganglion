@@ -7,6 +7,8 @@ import multiprocessing
 
 import pandas as pd
 
+from neuron import h
+
 import spiral_ganglion as sg
 
 import logging
@@ -254,7 +256,7 @@ def _run_single_electrode(
 def make_anf_electrode():
     h.celsius = 37
 
-    electrode = Electrode()
+    electrode = sg.Electrode()
     electrode.x = 300e-6
 
     anf = sg.ANF_Axon()
