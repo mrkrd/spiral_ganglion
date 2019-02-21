@@ -5,3 +5,7 @@
 * TODO Implement run_ci_simulation using thorns.util.map()
 * DONE Remove __author__ and similar
   CLOSED: [2016-07-28 Thu 14:39]
+* MAYBE find_threshold() should accept stimulus in an analytical form
+
+ATM find_threshold() accepts a numerical array as stimulus, which
+might lead to some imprecision.
