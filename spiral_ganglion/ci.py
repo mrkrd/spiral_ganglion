@@ -97,7 +97,7 @@ def run_ci_simulation(
     return trains
 
 
-def _simulate_anf_at( (z, electrodes, return_voltages) ):
+def _simulate_anf_at((z, electrodes, return_voltages)):
 
     logger.info("Calculating ANF at z = {} [m]".format(z))
 
@@ -173,7 +173,7 @@ def find_threshold(
 
     # find initial range: lo/hi
     while True:
-        spikes = _run_single_electrode(
+        above_threshold = _is_above_threshold(
             anf=anf,
             electrode=electrode,
             amplitude=hi,
@@ -182,7 +182,7 @@ def find_threshold(
             pre_stimulus=pre_stimulus,
             pad=pad
         )
-        if len(spikes) > 0:
+        if above_threshold:
             break
 
         logger.debug(" {:>20}  {:<20}".format(lo, hi))
@@ -196,7 +196,7 @@ def find_threshold(
     while (hi-lo) > error*(hi+lo)/2:
         amp = (hi+lo)/2
 
-        spikes = _run_single_electrode(
+        above_threshold = _is_above_threshold(
             anf=anf,
             electrode=electrode,
             amplitude=amp,
@@ -212,9 +212,9 @@ def find_threshold(
         # import matplotlib.pyplot as plt
         # plt.show()
 
-        logger.debug(" {:>20}  {:<20}, {}, {}".format(lo, hi, amp, spikes))
+        logger.debug(" {:>20}  {:<20}, {}, {}".format(lo, hi, amp, above_threshold))
 
-        if spikes.size > 0:
+        if above_threshold:
             hi = amp
         else:
             lo = amp
@@ -222,7 +222,7 @@ def find_threshold(
     return amp
 
 
-def _run_single_electrode(
+def _is_above_threshold(
         anf,
         electrode,
         amplitude,
@@ -248,9 +248,13 @@ def _run_single_electrode(
     )
 
     anf_trains = anf.get_trains()
-    spikes, = anf_trains['spikes']
 
-    return spikes
+    if (anf_trains is None) or (anf_trains['spikes'][0].size > 0):
+        above_threshold = True
+    else:
+        above_threshold = False
+
+    return above_threshold
 
 
 def make_anf_electrode():
@@ -266,14 +270,12 @@ def make_anf_electrode():
     return anf, electrode
 
 
-
-
 def main():
     import matplotlib.pyplot as plt
     from anf import plot_geometry
     anf, electrode = make_anf_electrode()
 
-    plot_geometry( [anf,electrode] )
+    plot_geometry([anf, electrode])
     plt.show()
 
     from signals import generate_pulse
@@ -287,7 +289,6 @@ def main():
         pad_widths=[10e-3, 5e-3]
     )
 
-
     th = find_threshold(anf, electrode, stimulus=stim, fs=fs)
     print(th)
 
@@ -295,7 +296,7 @@ def main():
 
     stim_dict = {6: stim}
     trains = run_ci_simulation(fs, stim_dict, anf_num=50)
-    p = th.plot_raster(trains, symboltype='circle' )
+    p = th.plot_raster(trains, symboltype='circle')
     p.xrange = (0, 1000*len(stim)/fs)
     p.show()
 

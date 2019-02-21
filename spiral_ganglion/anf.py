@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
-from __future__ import division, print_function, absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 from __future__ import unicode_literals
+
+import logging
+import warnings
 
 import numpy as np
 import pandas as pd
-import logging
 
 from neuron import h
 
@@ -19,12 +23,17 @@ def calc_tf(q10, temp_ref=22):
     return tf
 
 
-def _check_voltage_range(voltage):
+def _is_voltage_too_high(voltage):
 
     v = np.array(voltage) * 1e-3  # mV -> V
 
-    assert np.all(-0.16 < v)
-    assert np.all(v < 0.1)
+    if np.any(-0.16 > v) or np.any(v > 0.1):
+        warnings.warn("Voltage was too high!")
+        too_high = True
+    else:
+        too_high = False
+
+    return too_high
 
 
 class ANF(object):
@@ -178,8 +187,6 @@ class ANF(object):
         The neuron must be initialized with `record_voltages=True'.
 
         """
-        _check_voltage_range(self._last_voltage)
-
         voltages = [np.asarray(vec) for vec in self._voltages]
         voltages = np.array(voltages).T
 
@@ -192,18 +199,21 @@ class ANF(object):
         section.
 
         """
-        assert h.t != 0, "Time is 0 (did you run the simulation already?)"
-        _check_voltage_range(self._last_voltage)
+        if h.t == 0:
+            raise RuntimeError("Time is 0 (did you run the simulation?)")
 
-        row = {
-            'spikes': 1e-3*np.array(self._spikes),
-            'duration': 1e-3*h.t,
-            'type': 'anf'
-        }
+        if _is_voltage_too_high(self._last_voltage):
+            train = None
+        else:
+            row = {
+                'spikes': 1e-3*np.array(self._spikes),
+                'duration': 1e-3*h.t,
+                'type': 'anf'
+            }
 
-        row.update(self._meta)
+            row.update(self._meta)
 
-        train = pd.DataFrame([row])
+            train = pd.DataFrame([row])
 
         return train
 
@@ -212,13 +222,18 @@ class ANF(object):
         output.
 
         """
-        assert h.t != 0, "Time is 0 (did you run the simulation already?)"
-        spikes = 1e-3*np.array(self._spikes)
+        if h.t == 0:
+            raise RuntimeError("Time is 0 (did you run the simulation?)")
+
+        if _is_voltage_too_high(self._last_voltage):
+            spikes = None
+        else:
+            spikes = 1e-3*np.array(self._spikes)
+
         return spikes
 
     def ainit(self):
-        """
-        Initializes acoustical stimulation.
+        """Initializes acoustical stimulation.
 
         Note: must be called *after* neuron.init()
 
@@ -232,8 +247,7 @@ class ANF(object):
             self._con.event(float(v*1e3))
 
     def einit(self, dt_assert=0.002):
-        """
-        Initializes electrical stimulation.
+        """Initializes electrical stimulation.
 
         Note: must be called *before* neuron.init()
 
