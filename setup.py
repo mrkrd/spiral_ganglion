@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name = "spiral_ganglion",
-    version = "0.3",
+    version = "1",
     author = "Marek Rudnicki",
     author_email = "marek.rudnicki@tum.de",
 
@@ -27,8 +27,9 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: POSIX",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
     ],
 
     platforms = ["Linux", "FreeBSD"],
-    install_requires=["numpy", "neuron"],
+    install_requires=["numpy", "neuron", "cochlea"],
 )
