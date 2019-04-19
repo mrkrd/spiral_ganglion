@@ -45,9 +45,22 @@ Citing
 ------
 
 Rudnicki, M. (2018) *Computer models of acoustical and electrical stimulation
-of neurons in the auditory system*
+of neurons in the auditory system*.
 PhD thesis. Technische Universität München.
 https://mediatum.ub.tum.de/1445042
+
+
+BibTeX entry::
+
+  @PhdThesis{Rudnicki2018,
+    author  = {Rudnicki, Marek},
+    title   = {Computer models of acoustical and electrical stimulation of neurons in the auditory system},
+    school  = {Technische Universität München},
+    year    = {2018},
+    type    = {Dissertation},
+    address = {München},
+    url     = {https://mediatum.ub.tum.de?id=1445042},
+  }
 
 
 

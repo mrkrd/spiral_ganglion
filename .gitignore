@@ -6,3 +6,4 @@ tmp
 work
 *.egg-info
 .cache
+dist
