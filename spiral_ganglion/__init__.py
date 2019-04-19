@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from __future__ import division, print_function, absolute_import
 from __future__ import unicode_literals
@@ -34,7 +35,30 @@ from . ci import (
 
 from . ear import run_holmberg2007_sg
 
-from cochlea import get_nearest_cf_holmberg2007
+from cochlea.holmberg2007 import get_nearest_cf as get_nearest_cf_holmberg2007
+
+
+_citation = """Rudnicki, M. (2018)
+Computer models of acoustical and electrical stimulation
+of neurons in the auditory system.
+PhD thesis. Technische Universität München.
+https://mediatum.ub.tum.de/1445042"""
+
+_citation_width = 64
+
+print(
+    " Please cite ".center(_citation_width, '='),
+    file=sys.stderr
+)
+print(
+    _citation,
+    file=sys.stderr
+)
+print(
+    " Thank you! ".center(_citation_width, '='),
+    file=sys.stderr
+)
+
 
 
 def run(duration, anfs):
